@@ -6,6 +6,7 @@ import {useToastDialog} from '@/composables'
 import SignInView from '@/views/SignInView.vue'
 import PostsView from '@/views/PostsView.vue'
 import ErrorView from '@/views/ErrorView.vue'
+import AddAdress from '@/views/AddAdress.vue'
 
 const toastDialog = useToastDialog()
 const authToken = authTokenService()
@@ -28,6 +29,11 @@ const routes: RouteRecordRaw[] = [
       path: '/:all(.*)*',
       name: 'all',
       component: ErrorView
+   },
+   {
+      path: '/add-address',
+      name: 'AddAddress',
+      component: AddAdress
    }
 ] as RouteRecordRaw[]
 

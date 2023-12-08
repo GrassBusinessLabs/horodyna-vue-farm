@@ -8,6 +8,7 @@
   "BTNS": {
     "SIGN_IN": "Увійти",
     "LOGOUT": "Вийти",
+    "ADD_ADDRESS": "Додати адресу",
     "ADD_POST": "Додати пост"
   },
   "LANGUAGES": {

@@ -5,7 +5,7 @@
       <v-main class='bg-grey-lighten-3'>
          <v-container>
             <v-row>
-               <v-col cols='3' lg='2'>
+               <v-col cols='12'>
                   <v-card
                      class='mx-auto'
                      rounded='lg'
@@ -30,10 +30,20 @@
                            :block='true'
                            type='button'
                            variant='text'
+                           @click='addAdress()'
+                        >
+                           {{ translate('BTNS.ADD_ADDRESS') }}
+                        </v-btn>
+                        <v-btn
+                           class='mt-2'
+                           :block='true'
+                           type='button'
+                           variant='text'
                            @click='logout'
                         >
                            {{ translate('BTNS.LOGOUT') }}
                         </v-btn>
+                        
                      </v-card-text>
                   </v-card>
                </v-col>
@@ -58,11 +68,15 @@ import {storeToRefs} from 'pinia'
 import {useUserStore} from '@/stores'
 import {useAppI18n} from '@/i18n'
 import AppHeader from '@/components/AppHeader.vue'
+import router from '@/router'
 
 const {translate} = useAppI18n()
 const userStore = useUserStore()
 const {logout} = userStore
 const {currentUser} = storeToRefs(userStore)
+const addAdress = () => {
+   router.replace("/add-address")
+}
 </script>
 
 <style lang='scss' scoped>
