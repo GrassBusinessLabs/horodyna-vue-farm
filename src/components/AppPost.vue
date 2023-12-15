@@ -4,6 +4,13 @@
          <template v-slot:title>
             {{ post.title }}
          </template>
+         <v-img
+            :width="300"
+            aspect-ratio="16/9"
+            cover
+            :src="post.photo"
+         >
+         </v-img>
 
          <template v-slot:text>
             {{ post.body }}

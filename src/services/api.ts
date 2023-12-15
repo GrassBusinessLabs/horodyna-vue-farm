@@ -12,7 +12,7 @@ import {authTokenService} from '@/services/auth-token'
 export const apiService = () => {
 
    const authToken = authTokenService()
-   const apiUrl: string = 'https://dummyjson.com/'
+   const apiUrl: string = 'https://horodyna.grassbusinesslabs.tk/api/v1'
 
    const instance: AxiosInstance = axios.create({
       baseURL: apiUrl,
@@ -24,9 +24,12 @@ export const apiService = () => {
 
    instance.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
       const token: string | null = await authToken.get()
+      // let token = localStorage.getItem('token')
 
       if (token) {
-         config.headers!['Authorization'] = `Bearer ${token}`
+         console.log(token)
+         // config.headers!['Authorization'] = `Bearer ${token}`
+         config.headers.Authorization = `Bearer ${token}`;
       }
 
       return config
