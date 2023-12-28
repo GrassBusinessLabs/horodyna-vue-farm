@@ -1,26 +1,32 @@
 <template>
    <home-layout>
-      <v-sheet class='mx-auto'>
-         <v-form @submit.prevent='submit'>
+      <v-bottom-sheet>
+         <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" text="Додати товар" class="w-100"></v-btn>
+         </template>
+         <v-card
+            title="Інформація про товар"
+         >
+            <v-text-field
+               class="mt-6"
+               label='Додати посилання на фото'
+               v-model='myPhoto'
+               type='text'
+            ></v-text-field>
+            <v-form @submit.prevent='addPostLocal'>
             <v-row class='ma-0'>
                <v-col cols='12'>
                   <v-text-field
-                     v-model='title'
-                     v-bind='titleAttrs'
-                     :label='translate("INPUTS.TITLE")'
-                     :disabled='isSubmitting || loadingPosts'
-                     :hide-details='true'
+                     v-model='myTitle'
+                     label='Додати назву'
                      type='text'
                   ></v-text-field>
                </v-col>
 
                <v-col cols='12'>
                   <v-text-field
-                     v-model='text'
-                     v-bind='textAttrs'
-                     :label='translate("INPUTS.TEXT")'
-                     :disabled='isSubmitting || loadingPosts'
-                     :hide-details='true'
+                     v-model='myText'
+                     label='Додати опис'
                      type='text'
                   ></v-text-field>
                </v-col>
@@ -37,13 +43,14 @@
                   </v-btn>
                </v-col>
             </v-row>
-         </v-form>
-      </v-sheet>
+         </v-form></v-card>
+      </v-bottom-sheet>
+
 
       <v-row class='ma-0'>
          <app-post
             v-for='post in posts'
-            :key='post.id'
+            :key='Date.now()'
             :post='post'
          />
       </v-row>
@@ -66,6 +73,12 @@ import {useUserStore} from '@/stores'
 import HomeLayout from '@/layouts/HomeLayout.vue'
 import AppPost from '@/components/AppPost.vue'
 
+
+const myText = ref("")
+const myPhoto = ref("")
+const myTitle = ref("")
+
+
 const {handleError} = useHandleError()
 const {translate} = useAppI18n()
 const userStore = useUserStore()
@@ -74,10 +87,11 @@ const {currentUser} = storeToRefs(userStore)
 const request = requestService()
 const {vuetifyConfig, titleValidator, textValidator} = formService()
 
-const posts: Ref<Post[]> = ref<Post[]>([])
 const loadingPosts = ref<boolean>(false)
 
 let lastPostId: number = 0
+
+const posts = ref([])
 
 const form = useForm({
    validationSchema: toTypedSchema(
@@ -93,8 +107,6 @@ const form = useForm({
 })
 
 const isSubmitting = ref<boolean>(false)
-const [title, titleAttrs] = form.defineField('title' as MaybeRefOrGetter, vuetifyConfig)
-const [text, textAttrs] = form.defineField('text' as MaybeRefOrGetter, vuetifyConfig)
 
 onMounted(() => {
    loadPosts()
@@ -124,13 +136,9 @@ const submit = form.handleSubmit(async values => {
       }
       isSubmitting.value = true
 
-      const body: AddPostBody = {
-         title: values.title,
-         body: values.text,
-         userId: currentUser.value.id
-      }
 
-      const post: Post = await request.addPost(body)
+
+      const post: Post = addPostLocal(post)
       post.id = lastPostId + 1
       lastPostId = post.id
 
@@ -145,6 +153,15 @@ const submit = form.handleSubmit(async values => {
       isSubmitting.value = false
    }
 })
+
+   const addPostLocal = () => {
+      const body: AddPostBody = {
+         title: myTitle.value,
+         body: myText.value,
+         photo: myPhoto.value
+      }
+   posts.value.push(body)
+   }
 </script>
 
 <style lang='scss' scoped>

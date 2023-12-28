@@ -5,28 +5,27 @@ export const requestService = () => {
    const api = apiService()
 
    async function login(body: LoginBody): Promise<CurrentUser> {
+
       return api.post('/auth/login', body)
    }
 
    async function getPosts(): Promise<GetPostsResponse> {
-      return api.get('/auth/posts')
+      return api.get('/posts')
    }
 
    async function addPost(body: AddPostBody): Promise<Post> {
       // WARNING!!! This request only simulates adding a new post
-      return api.post('/auth/posts/add', body)
+      return api.post('/posts', body)
    }
 
    async function getCurrentUser(): Promise<CurrentUser> {
       // WARNING!!! In real projects, this request will look something like this api.get('/users/me')
-      return login({
-         username: 'kminchelle',
-         password: '0lelplR'
-      })
+      return api.get('users')
    }
 
    async function logout(): Promise<void> {
       // WARNING!!! In real projects, this request will look something like this api.post('/logout')
+      return api.post('/auth/logout')
    }
 
    return {

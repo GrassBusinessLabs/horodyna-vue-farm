@@ -7,6 +7,7 @@ import SignInView from '@/views/SignInView.vue'
 import PostsView from '@/views/PostsView.vue'
 import ErrorView from '@/views/ErrorView.vue'
 import AddAdress from '@/views/AddAdress.vue'
+import AppAddressAutocomplete from '@/components/AppAddressAutocomplete.vue'
 
 const toastDialog = useToastDialog()
 const authToken = authTokenService()
