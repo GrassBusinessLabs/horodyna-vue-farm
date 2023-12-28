@@ -1,0 +1,51 @@
+@import 'cropperjs/dist/cropper.css';
+@import "@tomtom-international/web-sdk-maps/dist/maps.css";
+.Vue-Toastification__container.toast-dialog-container {
+  width: 300px;
+  left: auto;
+  right: 15px;
+  top: 15px;
+
+  & .toast-dialog-error, & .toast-dialog-info {
+    border-radius: 15px;
+    min-width: 300px;
+  }
+}
+
+.image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.center-image {
+  display: block;
+  margin: 0 auto;
+}
+
+.title-container {
+  text-align: center;
+}
+
+.custom-btn {
+  background-color: #2196F3;
+  color: #fff;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.custom-btn:hover {
+  background-color: #0D47A1;
+}
+
+.delete-btn {
+  background-color: #FF5252;
+  color: #fff;
+}
+
+.edit-btn {
+  background-color: #2196F3;
+  color: #fff;
+}
