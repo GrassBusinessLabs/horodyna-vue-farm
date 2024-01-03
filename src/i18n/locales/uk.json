@@ -8,8 +8,11 @@
   "BTNS": {
     "SIGN_IN": "Увійти",
     "LOGOUT": "Вийти",
-    "ADD_ADDRESS": "Додати адресу",
-    "ADD_POST": "Додати товар"
+    "ADD_ADDRESS": "Налаштування",
+    "ADD_POST": "Додати товар",
+    "SETTINGS": "Підтримка",
+    "MAINPAGE": "Головна",
+    "ABOUT": "Про нас"
   },
   "LANGUAGES": {
     "ENGLISH": "Англійська",

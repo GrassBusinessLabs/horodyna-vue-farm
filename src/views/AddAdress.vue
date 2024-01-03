@@ -1,6 +1,6 @@
 <template>
    <home-layout>
-      <h1 class="centered-text">MAP</h1>
+      <h1 class="centered-text">Мій профіль</h1>
       <app-map-example />
    </home-layout>
 </template>
