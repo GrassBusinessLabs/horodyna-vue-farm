@@ -1,14 +1,16 @@
 <template>
    <v-app-bar color='primary'>
-      <v-btn icon @click="toggleSidebar" v-if="route.path !== '/sign-in'">
+      <v-btn icon @click="toggleSidebar" v-if="route.path !== '/sign-in' && route.path !== '/add-address'" >
         <v-icon>mdi-menu</v-icon>
+      </v-btn>
+
+      <v-btn icon @click="goBack" v-if="route.path === '/add-address'">
+        <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
 
       <v-app-bar-title>Городина</v-app-bar-title>
 
-      <template v-slot:append>
-        <app-select-lang />
-      </template>
+      
    </v-app-bar>
 
    <v-navigation-drawer v-model="sidebarOpen" app >
@@ -79,6 +81,10 @@ const route = useRoute()
 
 function toggleSidebar() {
    sidebarOpen.value = !sidebarOpen.value
+}
+
+function goBack() {
+   router.replace("/posts")
 }
 </script>
 
