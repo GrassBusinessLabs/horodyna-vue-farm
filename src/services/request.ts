@@ -1,5 +1,5 @@
 import {apiService} from '@/services/api'
-import type {AddPostBody, CurrentUser, GetPostsResponse, LoginBody, Post} from '@/models'
+import type {AddPostBody, CurrentUser, GetPostsResponse, LoginBody, Post, createOffer, changeOffer} from '@/models'
 
 export const requestService = () => {
    const api = apiService()
@@ -9,9 +9,9 @@ export const requestService = () => {
       return api.post('/auth/login', body)
    }
 
-   async function getPosts(): Promise<GetPostsResponse> {
-      return api.get('/posts')
-   }
+   // async function getPosts(): Promise<GetPostsResponse> {
+   //    return api.get('/posts')
+   // }
 
    async function addPost(body: AddPostBody): Promise<Post> {
       // WARNING!!! This request only simulates adding a new post
@@ -27,12 +27,26 @@ export const requestService = () => {
       // WARNING!!! In real projects, this request will look something like this api.post('/logout')
       return api.post('/auth/logout')
    }
-
+   async function getCategories() {
+      return api.get('/categories')
+   }
+   async function createOffer(body: createOffer) {
+      return api.post('/offers', body)
+   }
+   async function getOffers() {
+      return api.get('/offers')
+   }
+   async  function changeOffer(offerid:any, body: changeOffer){
+      return api.put(`/offers/${offerid}`, body)
+   }
    return {
       login,
-      getPosts,
+      createOffer,
+      getCategories,
       getCurrentUser,
       logout,
-      addPost
+      addPost,
+      getOffers,
+      changeOffer
    }
 }

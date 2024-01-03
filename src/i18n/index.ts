@@ -14,12 +14,12 @@ export interface LangInfo {
    localizeKey: string
 }
 
-const defaultLang: Lang = 'en'
+const defaultLang: Lang = 'uk'
 
 const i18n = createI18n({
    legacy: false,
    locale: defaultLang,
-   messages: {en, uk}
+   messages: {uk}
 })
 
 export const useAppI18n = () => {

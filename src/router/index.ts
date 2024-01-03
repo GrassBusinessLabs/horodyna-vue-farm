@@ -7,7 +7,10 @@ import SignInView from '@/views/SignInView.vue'
 import PostsView from '@/views/PostsView.vue'
 import ErrorView from '@/views/ErrorView.vue'
 import AddAdress from '@/views/AddAdress.vue'
+import SettingsView from '@/views/SettingsView.vue'
 import AppAddressAutocomplete from '@/components/AppAddressAutocomplete.vue'
+import Profile from '@/views/Profile.vue'
+import AboutUs from '@/views/AboutUs.vue'
 
 const toastDialog = useToastDialog()
 const authToken = authTokenService()
@@ -35,6 +38,21 @@ const routes: RouteRecordRaw[] = [
       path: '/add-address',
       name: 'AddAddress',
       component: AddAdress
+   },
+   {
+      path: '/settings',
+      name: 'Settings',
+      component: SettingsView
+   },
+   {
+      path: '/profile',
+      name: 'Profile',
+      component: Profile
+   },
+   {
+      path: '/about',
+      name: 'AboutUs',
+      component: AboutUs
    }
 ] as RouteRecordRaw[]
 

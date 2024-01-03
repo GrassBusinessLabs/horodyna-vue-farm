@@ -1,7 +1,7 @@
 <template>
-   <v-col cols='12'>
-      <app-map />
-   </v-col>
+<!--   <v-col cols='12'>-->
+<!--      <app-map />-->
+<!--   </v-col>-->
 
    <v-col cols='12'>
       <app-address-autocomplete @select='selectAddress' />
