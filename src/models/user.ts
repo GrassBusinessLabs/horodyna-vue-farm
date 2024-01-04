@@ -6,5 +6,5 @@ export interface CurrentUser {
    image: string
    lastName: string
    token: string
-   username: string
+   name: string
 }

@@ -56,7 +56,7 @@ import {storeToRefs} from 'pinia'
 interface SettingItem {
    title: string
    category: string
-   value: string
+   value?: string
    showSwitch: boolean
    icon: string
    routing?: Function
@@ -79,7 +79,7 @@ const category = ref('')
 
 const userStore = useUserStore()
 const {currentUser} = storeToRefs(userStore)
-const {name, email} = currentUser.value
+
 
 const filteredItems = ref<SettingItem[]>([])
 
@@ -90,8 +90,8 @@ const showSettingSheet = (settingCategory: string) => {
 }
 
 const settingsItems: SettingItem[] = [
-   {title: `Ім'я:`, category: 'Аккаунт', value: name, showSwitch: false, icon: ''},
-   {title: 'Email:', category: 'Аккаунт', value: email, showSwitch: false, icon: ''},
+   {title: `Ім'я:`, category: 'Аккаунт', value: currentUser?.value?.name, showSwitch: false, icon: ''},
+   {title: 'Email:', category: 'Аккаунт', value: currentUser?.value?.email, showSwitch: false, icon: ''},
    {title: 'Змінити пароль', category: 'Аккаунт', value: '', showSwitch: false, icon: 'mdi-chevron-right'},
    {title: 'Вийти з аккаунту', category: 'Аккаунт', value: '', showSwitch: false, icon: 'mdi-chevron-right', routing: userStore.logout},
    {title: 'Сповіщати', category: 'Повідомлення', value: '', showSwitch: true, icon: ''},

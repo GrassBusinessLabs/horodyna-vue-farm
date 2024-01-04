@@ -8,9 +8,9 @@ import PostsView from '@/views/PostsView.vue'
 import ErrorView from '@/views/ErrorView.vue'
 import AddAdress from '@/views/AddAdress.vue'
 import SettingsView from '@/views/SettingsView.vue'
-import AppAddressAutocomplete from '@/components/AppAddressAutocomplete.vue'
+
 import Profile from '@/views/Profile.vue'
-import AboutUs from '@/views/AboutUs.vue'
+import AboutPage from '@/views/AboutPage.vue'
 
 const toastDialog = useToastDialog()
 const authToken = authTokenService()
@@ -51,13 +51,13 @@ const routes: RouteRecordRaw[] = [
    },
    {
       path: '/about',
-      name: 'AboutUs',
-      component: AboutUs
+      name: 'AboutPage',
+      component: AboutPage
    }
 ] as RouteRecordRaw[]
 
 const router = createRouter({
-   history: createWebHistory(),
+   history: createWebHistory(import.meta.env.BASE_URL),
    routes
 } as RouterOptions)
 

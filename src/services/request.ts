@@ -1,5 +1,5 @@
 import {apiService} from '@/services/api'
-import type {AddPostBody, CurrentUser, GetPostsResponse, LoginBody, Post, createOffer, changeOffer} from '@/models'
+import type {AddPostBody, CurrentUser, LoginBody, Post, createOffer, changeOffer} from '@/models'
 
 export const requestService = () => {
    const api = apiService()
@@ -36,8 +36,14 @@ export const requestService = () => {
    async function getOffers() {
       return api.get('/offers')
    }
-   async  function changeOffer(offerid:any, body: changeOffer){
-      return api.put(`/offers/${offerid}`, body)
+   async function getOfferById(id: any) {
+      return api.get(`/offers/${id}`)
+   }
+   async  function changeOffer(body: changeOffer){
+      return api.put(`/offers/${body.id}`, body)
+   }
+   async function deleteOffer(id: any){
+      return api.del(`/offers/${id}`)
    }
    return {
       login,
@@ -47,6 +53,8 @@ export const requestService = () => {
       logout,
       addPost,
       getOffers,
-      changeOffer
+      changeOffer,
+      getOfferById,
+      deleteOffer
    }
 }

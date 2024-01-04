@@ -2,7 +2,6 @@ import {createI18n, useI18n} from 'vue-i18n'
 
 import {appStorageService} from '@/services'
 import {LANG} from '@/constants'
-import en from '@/i18n/locales/en.json'
 import uk from '@/i18n/locales/uk.json'
 
 export type Lang = 'en' | 'uk'

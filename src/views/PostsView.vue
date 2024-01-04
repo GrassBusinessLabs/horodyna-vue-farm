@@ -1,11 +1,12 @@
 <template>
    <home-layout>
+      <v-btn class="custom-btn w-100 mb-2nmp " @click="bottomSheetOpen = true">Додати товар</v-btn>
       <v-bottom-sheet v-model="bottomSheetOpen">
-         <template v-slot:activator="{ props }">
-            <v-card-actions>
-               <v-btn class="custom-btn w-100 mb-2nmp " @click="bottomSheetOpen = true">Додати товар</v-btn>
-            </v-card-actions>
-         </template>
+
+
+
+
+
          <v-card
             title="Інформація про товар"
          >
@@ -76,6 +77,78 @@
             </v-row>
          </v-form></v-card>
       </v-bottom-sheet>
+      <v-bottom-sheet v-model="EditSheet">
+         <v-card
+            title="Редагування товару"
+         >
+            <app-select-img-example/>
+
+            <v-form @submit.prevent='addPostLocal'>
+               <v-row class='ma-0'>
+                  <v-col cols='12'>
+                     <v-text-field
+                        v-model='bodyChangeOffer.title'
+                        label='Додати назву'
+                        type='text'
+                     ></v-text-field>
+                  </v-col>
+
+                  <v-col cols='12'>
+                     <v-text-field
+                        v-model='bodyChangeOffer.description'
+                        label='Додати опис'
+                        type='text'
+                     ></v-text-field>
+                  </v-col>
+
+                  <v-col cols='12'>
+                     <v-select
+                        v-model="bodyChangeOffer.category"
+                        :items="categories"
+                        label="Категорія"
+                     ></v-select>
+                  </v-col>
+
+                  <v-col cols='12'>
+                     <v-text-field
+                        v-model='bodyChangeOffer.price'
+                        label='Ціна'
+                        type="Number"
+                     ></v-text-field>
+
+                  </v-col>
+                  <v-col cols='12'>
+                     <v-select
+                        v-model="bodyChangeOffer.unit"
+                        :items="units"
+                        label="Одиниця"
+                     ></v-select>
+                  </v-col>
+
+                  <v-col cols='12'>
+                     <v-text-field
+                        v-model='bodyChangeOffer.stock'
+                        label='Запас'
+                        type='number'
+                     ></v-text-field>
+                  </v-col>
+
+                  <v-col cols='12'>
+                     <v-btn
+                        class='mt-2'
+                        :block='true'
+                        :disabled='isSubmitting || loadingPosts'
+                        type='submit'
+                        color='primary'
+                        @click="changeOffer()"
+                     >
+<!--                        {{ translate('BTNS.ADD_POST') }}-->
+                        Редагувати
+                     </v-btn>
+                  </v-col>
+               </v-row>
+            </v-form></v-card>
+      </v-bottom-sheet>
 <!--      <div v-for='i of offersStore.offers'>-->
 <!--         {{i.title}}-->
 <!--         {{i.description}}-->
@@ -113,68 +186,108 @@
                ></v-switch>
 
                <v-card-actions>
-                  <v-btn class="custom-btn" @click="showBottomSheet = true">Редагувати</v-btn>
-                  <v-btn class="custom-btn delete-btn" @click="showBottomSheet = true">Видалити</v-btn>
+                  <v-btn class="custom-btn" @click="idFromOffer(i.id)">Редагувати</v-btn>
+                  <v-btn class="custom-btn delete-btn" @click="deleteOffer(i.id)">Видалити</v-btn>
                </v-card-actions>
 
             </v-card>
          </v-col>
       </v-row>
 
-      <v-row class='ma-0'>
-         <app-post
-            v-for='post in posts'
-            :key='Date.now()'
-            :post='post'
-         />
-      </v-row>
+
    </home-layout>
 </template>
 
 <script lang='ts' setup>
 
-import type {MaybeRefOrGetter, Ref} from 'vue'
+
 import {onMounted, reactive, ref} from 'vue'
-import {useForm} from 'vee-validate'
-import {toTypedSchema} from '@vee-validate/yup'
+
+
 import {storeToRefs} from 'pinia'
-import * as yup from 'yup'
-import type {AddPostBody, createOffer, GetPostsResponse, Post} from '@/models'
-import {formService, requestService} from '@/services'
+
+import type {AddPostBody, changeOffer, createOffer} from '@/models'
+import {requestService} from '@/services'
 import {useHandleError} from '@/composables'
 import {useAppI18n} from '@/i18n'
 import {useUserStore} from '@/stores'
 import HomeLayout from '@/layouts/HomeLayout.vue'
-import AppPost from '@/components/AppPost.vue'
+
 import AppSelectImgExample from '@/components/AppSelectImgExample.vue'
 import {useOffersStore} from '@/stores/offers-store.ts'
+
+
 
 const linkIMG = 'https://horodyna.grassbusinesslabs.tk/static/'
 const offersStore = useOffersStore()
 const myText = ref("")
-const myPhoto = ref(null)
+const myPhoto = ref("")
 const myTitle = ref("")
 const myCategory = ref("")
 const myPrice = ref(0)
 const myUnit = ref("")
 const myStock = ref(0)
 const bottomSheetOpen = ref(false)
+const EditSheet = ref(false)
 
-const categories = []
+const categories = ref<string[]>([])
 const namecategories = [{UA: 'Овочі', EN: 'Vegetables'}, {UA: 'Риба', EN: 'Fish'}, {UA: 'Заморожена їда', EN: 'Frozen food'}, {UA: 'Фрукти', EN: 'Fruits'}, {UA: 'Випічка', EN: 'Bakery'}, {UA: 'Солодощі', EN: 'Sweets'}, {UA: 'Здорове харчування', EN: 'Healthy food'}, {UA: "М'ясо", EN: 'Meat'}, {UA: 'Молочні продукти', EN: 'Dairy products'}]
 
 let bodyOffer:createOffer = reactive({
    title: '',
+   farm_id: Date.now(),
    description: '',
-   photo: {
+   image: {
       name: '',
       data: ''
    },
    category: '',
    price: 0,
+   status: true,
    unit: '',
    stock: 0
 })
+
+let bodyChangeOffer:changeOffer = reactive({
+   id: 0,
+   title: '',
+   description: '',
+   category: '',
+   price: 0,
+   status: true,
+   unit: '',
+   stock: +0,
+   farm_id: +0,
+   image: {
+      name: "",
+      data: ''
+   }
+})
+
+
+ async function idFromOffer(id: any) {
+   const response = await request.getOfferById(id)
+    bodyChangeOffer = reactive({
+       id: id,
+       title:response.title,
+       description: response.description,
+       category: response.category,
+       price: +response.price,
+       status: response.status,
+       unit: response.unit,
+       stock: Number(response.stock),
+       farm_id: response.farm_id,
+       image: {
+          name: localStorage.getItem('fileName'),
+          data: localStorage.getItem('croppedImg')
+       }
+ })
+
+   console.log(id)
+   EditSheet.value = true
+
+
+}
 async function addOffer(){
    const bodyT : createOffer = {
       farm_id: 9,
@@ -190,7 +303,7 @@ async function addOffer(){
    }
    try{
       const response = await request.createOffer(bodyT)
-      getOffer()
+      await getOffer()
       console.log(response)
 
    }catch (e) {
@@ -198,6 +311,85 @@ async function addOffer(){
       handleError(e)
    }
 }
+
+async function deleteOffer(id: any) {
+   try{
+      const response = await request.deleteOffer(id)
+      await getOffer()
+
+      console.log(response)
+   } catch (e) {
+      console.log(e)
+   }
+}
+async function changeOffer() {
+   const bodySend = {
+      id: bodyChangeOffer.id,
+      title: bodyChangeOffer.title,
+      description: bodyChangeOffer.description,
+      category: bodyChangeOffer.category,
+      price: +bodyChangeOffer.price,
+      status: bodyChangeOffer.status,
+      unit: bodyChangeOffer.unit,
+      stock: +bodyChangeOffer.stock,
+      farm_id: bodyChangeOffer.farm_id,
+      image: {
+         name: bodyChangeOffer.image.name,
+         data: bodyChangeOffer.image.data
+      }
+   }
+   try {
+      const response = await request.changeOffer(bodySend)
+      await getOffer()
+
+      EditSheet.value = false
+      console.log(response)
+   }
+   catch (e) {
+      console.log(e)
+   }
+}
+
+// async function changeOffer() {
+//    const changed = {
+//
+//    }
+// }
+// async function changeOffers(offer:changeOffer){
+//    bodyOffer.title = offer.title
+//    bodyOffer.description = offer.description
+//    bodyOffer.image.name = offer.image.name
+//    bodyOffer.image.data = offer.image.data
+//    bodyOffer.category = offer.category
+//    bodyOffer.price = offer.price
+//    bodyOffer.unit = offer.unit
+//    bodyOffer.stock = offer.stock
+//
+//    const bodyT : changeOffer = {
+//
+//       farm_id: offer.farm_id,
+//       id: offer.id,
+//       title: offer.title,
+//       description: offer.description,
+//       image: {
+//          name: offer.image.name,
+//          data: offer.image.data},
+//       category: offer.category,
+//       price: +offer.price,
+//       status: offer.status,
+//       unit: offer.unit,
+//       stock: +offer.stock
+//    }
+//    try{
+//       const response = await request.changeOffer(bodyT)
+//
+//       console.log(response)
+//
+//    }catch (e) {
+//       console.error(e)
+//       handleError(e)
+//    }
+// }
 
 async function getOffer(){
 
@@ -225,26 +417,15 @@ const userStore = useUserStore()
 const {currentUser} = storeToRefs(userStore)
 
 const request = requestService()
-const {vuetifyConfig, titleValidator, textValidator} = formService()
+
 
 const loadingPosts = ref<boolean>(false)
 
-let lastPostId: number = 0
 
-const posts = ref([])
 
-const form = useForm({
-   validationSchema: toTypedSchema(
-      yup.object({
-         title: titleValidator(),
-         text: textValidator()
-      })
-   ),
-   initialValues: {
-      title: '',
-      text: ''
-   }
-})
+const posts = ref<AddPostBody[]>([])
+
+
 
 const isSubmitting = ref<boolean>(false)
 
@@ -269,47 +450,14 @@ const isSubmitting = ref<boolean>(false)
 //    }
 // }
 
-const submit = form.handleSubmit(async values => {
-   try {
-      if (isSubmitting.value) {
-         return
-      }
-      isSubmitting.value = true
 
-      const formData = new FormData()
-      formData.append('title', myTitle.value)
-      formData.append('text', myText.value)
-      formData.append('photo', myPhoto.value)
-      formData.append('price', myPrice.value)
-      formData.append('unit', myUnit.value)
-      formData.append('stock', myStock.value)
-
-      const response = await request.addPost(formData)
-      const post: Post = response.data
-      posts.value.unshift(post)
-
-      form.resetForm()
-      myTitle.value = ''
-      myText.value = ''
-      myPhoto.value = null
-      myPrice.value = 0
-      myUnit.value = ''
-      myStock.value = 0
-
-      isSubmitting.value = false
-   } catch (e) {
-      console.error(e)
-      handleError(e)
-      isSubmitting.value = false
-   }
-})
 const getCategories = () => {
    try  {
-      const response = request.getCategories().then((response) => {
+      request.getCategories().then((response) => {
          for (let i of response.data){
             for(let j of namecategories){
                if (i.name === j.EN){
-                  categories.push(j.UA)
+                  categories.value.push(j.UA)
                }
             }
 
@@ -328,6 +476,7 @@ onMounted(() => {
 
 const addPostLocal = () => {
    const body: AddPostBody = {
+      userId: currentUser?.value?.id ?currentUser?.value?.id: -1,
       title: myTitle.value,
       body: myText.value,
       photo: myPhoto.value,
@@ -339,15 +488,13 @@ const addPostLocal = () => {
    posts.value.push(body)
    myTitle.value = ''
    myText.value = ''
-   myPhoto.value = null
+   myPhoto.value = ''
    myCategory.value = ''
    myPrice.value = 0
    myUnit.value = ''
    myStock.value = 0
 }
-const data = () => ({
-   model: 'no',
-});
+
 
 </script>
 

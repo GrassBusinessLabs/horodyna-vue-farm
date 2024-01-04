@@ -12,7 +12,7 @@
 import {LngLatLike, Marker} from '@tomtom-international/web-sdk-maps'
 
 import {AddressItem, mapService} from '@/services/map'
-import AppMap from '@/components/AppMap.vue'
+
 import AppAddressAutocomplete from '@/components/AppAddressAutocomplete.vue'
 
 const map = mapService()
@@ -23,7 +23,7 @@ const duration: number = 500
 async function selectAddress(address: AddressItem): Promise<void> {
    map.removeAllMarkers()
 
-   const marker: Marker | null = map.createMarker(address.details.id, address.details.position as LngLatLike)
+   const marker: Marker | null = map.createMarker(address.details.id ?address.details.id:"Error", address.details.position as LngLatLike)
 
    if (marker) {
       map.addMarkerToMap(marker)

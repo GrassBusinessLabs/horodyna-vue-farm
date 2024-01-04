@@ -63,7 +63,7 @@ async function openImageCropper(event: Event): Promise<void> {
    }
 
    const file: File = input.files![0]
-   fileInputRef.value.value = null
+   fileInputRef.value = null
 
    imageCropperRef.value.initCropper(file)
 }

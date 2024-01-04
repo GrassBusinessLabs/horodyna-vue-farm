@@ -25,7 +25,7 @@
       <v-card class='mx-auto' rounded='lg'>
 
          <template v-slot:title>
-            <span class='card-title'>{{ currentUser?.username }}</span>
+            <span class='card-title'>{{ currentUser?.name }}</span>
          </template>
 
          <v-card-text>
@@ -57,7 +57,7 @@
 <script lang='ts' setup>
 import { useRoute } from 'vue-router';
 import { ref } from 'vue'
-import AppSelectLang from '@/components/AppSelectLang.vue'
+
 import { storeToRefs } from 'pinia'
 
 import { useUserStore } from '@/stores'

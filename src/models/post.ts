@@ -17,10 +17,14 @@ export type GetPostsResponse = Pagination<{posts: Post[]}>
 
 export interface AddPostBody {
    body: string
+   photo: string
+   category: string
+   price: number
+   unit: string
+   stock: number
    title: string
    userId: number
-   tags?: string[]
-   reactions?: number
+
 }
 export interface createOffer{
    title: string,
@@ -31,21 +35,23 @@ export interface createOffer{
    stock: number,
    farm_id: number,
    image: {
-      name: string,
-      data: string
+      name: string | null,
+      data: string | null
    }
 
 }
 export interface changeOffer {
+   id: number,
    title: string,
    description: string,
    category: string,
    price: number,
+   status: boolean,
    unit: string,
    stock: number,
    farm_id: number,
    image: {
-      name: string,
-      data: string
+      name: string | null,
+      data: string | null
    }
 }
