@@ -83,12 +83,12 @@ async function initCropper(file: File): Promise<void> {
    console.log(file.name)
    const regex = /base64,(.*)/
    const matches = chosenImage.value.match(regex)
-   console.log(matches[1])
+
    showCropper.value = true
    imageFileType.value = file.type
    await new Promise(resolve => setTimeout(resolve, 50))
    cropper.value!.replace(chosenImage.value!)
-   localStorage.setItem('croppedImg', matches[1])
+   localStorage.setItem('croppedImg', matches && matches.length > 1?matches[1]:"Error")
 }
 
 function hideCropper(): void {
@@ -107,11 +107,18 @@ async function convertToBase64(file: File): Promise<string> {
       reader.readAsDataURL(file)
       console.log(file.name)
       localStorage.setItem('fileName', file.name)
-      reader.onload = () => resolve(reader.result)
-      console.log(reader.result)
+      reader.onload = () => {
+         // Perform a null check before resolving the promise
+         if (reader.result !== null && typeof reader.result === 'string') {
+            resolve(reader.result)
+         } else {
+            reject(new Error('Failed to read file as string'))
+         }
+      }
       reader.onerror = error => reject(error)
    })
 }
+
 
 
 </script>

@@ -40,7 +40,7 @@
 
 <script lang='ts' setup>
 import { defineEmits, ref } from 'vue'
-import * as debounce from 'lodash.debounce'
+import debounce from "lodash.debounce"
 import AppMap from './AppMap.vue'
 import type { AddressItem } from '@/services/map'
 import { mapService } from '@/services/map'
@@ -62,7 +62,7 @@ const saveData = () => {
    localStorage.setItem('surname', surname.value)
    localStorage.setItem('phoneNumber', phoneNumber.value)
    localStorage.setItem('email', email.value)
-   localStorage.setItem('adress', addressModel?.address)
+   localStorage.setItem('adress', addressModel?.value?.address ? addressModel?.value?.address: "Error")
    console.log('Data saved:', name.value, surname.value, phoneNumber.value, email.value)
    editing.value = false
 }
@@ -73,8 +73,8 @@ const editData = () => {
 
 const loading = ref<boolean>(false)
 const addressModel = ref<AddressItem | null>(null)
-const searchModel = ref<string | null>(null)
-const items = ref<AddressItem[]>([])
+const searchModel = ref<string | undefined>(undefined)
+const items = ref<AddressItem[] | undefined>([])
 
 const debounceSearch = debounce(search, 1000)
 

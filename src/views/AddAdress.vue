@@ -4,7 +4,7 @@
       <app-map-example />
    </home-layout>
 </template>
-<script setup>
+<script lang='ts' setup>
 import AppMapExample from '@/components/AppMapExample.vue'
 import HomeLayout from '@/layouts/HomeLayout.vue'
 </script>

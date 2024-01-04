@@ -1,11 +1,10 @@
 <template>
    <home-layout>
-      <h1 class="centered-text">Мій профіль</h1>
+      <h1 class="centered-text">Підтримка</h1>
       <app-map-example />
    </home-layout>
 </template>
-<script setup>
-import AppMapExample from '@/components/AppMapExample.vue'
+<script lang='ts' setup>
 import HomeLayout from '@/layouts/HomeLayout.vue'
 </script>
 <style>

@@ -29,6 +29,7 @@
     "@mdi/font": "^7.3.67",
     "@types/lodash.debounce": "^4.0.9",
     "@types/node": "^20.10.3",
+    "@types/vue-cropperjs": "^4.1.6",
     "@vitejs/plugin-vue": "^4.5.0",
     "sass": "^1.69.5",
     "typescript": "^5.2.2",

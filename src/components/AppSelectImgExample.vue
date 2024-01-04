@@ -19,7 +19,7 @@
          :src='croppedImg'
          alt='Cropped image'
       >
-      {{croppedImg}}
+
    </v-col>
 
    <v-col cols='12 mt-2'>
@@ -28,7 +28,7 @@
          :block='true'
          @click='chooseFile'
       >
-         Load
+         Обрати зображення
       </v-btn>
    </v-col>
 </template>
@@ -63,7 +63,7 @@ async function openImageCropper(event: Event): Promise<void> {
    }
 
    const file: File = input.files![0]
-   fileInputRef.value.value = null
+   fileInputRef.value = null
 
    imageCropperRef.value.initCropper(file)
 }

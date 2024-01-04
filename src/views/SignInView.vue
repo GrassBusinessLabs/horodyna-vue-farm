@@ -89,11 +89,12 @@ const submit = form.handleSubmit(async values => {
          return
       }
       isSubmitting.value = true
-
       const body: LoginBody = {
-         email: values.email,
+         email: values.email ? values.email:"Error",
          password: values.password
       }
+
+
 
       const currentUser: CurrentUser = await request.login(body)
       setCurrentUser(currentUser)
