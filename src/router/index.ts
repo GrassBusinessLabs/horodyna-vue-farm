@@ -57,9 +57,9 @@ const routes: RouteRecordRaw[] = [
 ] as RouteRecordRaw[]
 
 const router = createRouter({
-   history: createWebHistory(),
+   history: createWebHistory(import.meta.env.BASE_URL),
    routes
-} as RouterOptions)
+} as RouterOptions);
 
 router.beforeEach(async (to: RouteLocationNormalized) => {
    try {
