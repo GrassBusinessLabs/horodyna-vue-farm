@@ -11,8 +11,13 @@ export const useRouting = () => {
       return router.push('/posts')
    }
 
+   async function toCatalog() {
+      return router.push('/catalog')
+   }
+
    return {
       toSignIn,
-      toPosts
+      toPosts,
+      toCatalog
    }
 }

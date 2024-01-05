@@ -29,6 +29,11 @@
          </template>
 
          <v-card-text>
+
+           <v-btn class='mt-2' :block='true' type='button' variant='text' @click='goToMain'>
+             {{ translate('BTNS.MAINPAGE') }}
+           </v-btn>
+
             <v-btn class='mt-2' :block='true' type='button' variant='text' @click='addAddress()'>
                {{ translate('BTNS.ADD_ADDRESS') }}
             </v-btn>
@@ -41,9 +46,6 @@
                {{ translate('BTNS.ABOUT') }}
             </v-btn>
 
-            <v-btn class='mt-2' :block='true' type='button' variant='text' @click='goToMain'>
-               {{ translate('BTNS.MAINPAGE') }}
-            </v-btn>
 
             <v-btn class='mt-2' :block='true' type='button' variant='text' @click='logout'>
                {{ translate('BTNS.LOGOUT') }}
