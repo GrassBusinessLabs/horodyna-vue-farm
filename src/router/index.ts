@@ -8,6 +8,7 @@ import PostsView from '@/views/PostsView.vue'
 import ErrorView from '@/views/ErrorView.vue'
 import AddAdress from '@/views/AddAdress.vue'
 import SettingsView from '@/views/SettingsView.vue'
+import RegistrationView from '@/views/RegistrationView.vue'
 
 import Profile from '@/views/Profile.vue'
 import AboutPage from '@/views/AboutPage.vue'
@@ -53,7 +54,13 @@ const routes: RouteRecordRaw[] = [
       path: '/about',
       name: 'AboutPage',
       component: AboutPage
+   },
+   {
+      path: '/register',
+      name: 'Register',
+      component: RegistrationView
    }
+
 ] as RouteRecordRaw[]
 
 const router = createRouter({

@@ -18,20 +18,20 @@
          prepend-avatar='https://randomuser.me/api/portraits/men/78.jpg'
          class='my-padding'
       >
-         <v-list-item-title class='text-h6'>User Name</v-list-item-title>
-         <v-list-item-subtitle class='text-subtitle-1'>sa@test.com</v-list-item-subtitle>
+        <v-list-item-title class='my-subtitle app-font-regular'>{{ currentUser?.name }}</v-list-item-title>
+        <v-list-item-subtitle class='my-font-size'>{{ currentUser?.email }}</v-list-item-subtitle>
       </v-list-item>
 
       <v-card class='mx-auto' rounded='lg'>
-
-         <template v-slot:title>
-            <span class='card-title'>{{ currentUser?.name }}</span>
-         </template>
 
          <v-card-text>
 
            <v-btn class='mt-2' :block='true' type='button' variant='text' @click='goToMain'>
              {{ translate('BTNS.MAINPAGE') }}
+           </v-btn>
+
+           <v-btn class='mt-2' :block='true' type='button' variant='text' @click='addAdress'>
+             {{ translate('BTNS.ADD') }}
            </v-btn>
 
             <v-btn class='mt-2' :block='true' type='button' variant='text' @click='addAddress()'>
@@ -45,7 +45,6 @@
             <v-btn class='mt-2' :block='true' type='button' variant='text' @click='aboutUs'>
                {{ translate('BTNS.ABOUT') }}
             </v-btn>
-
 
             <v-btn class='mt-2' :block='true' type='button' variant='text' @click='logout'>
                {{ translate('BTNS.LOGOUT') }}
@@ -96,6 +95,9 @@ function goToMain() {
 
 function aboutUs() {
    router.replace("/about")
+}
+function addAdress() {
+  router.replace("/add-address")
 }
 </script>
 
