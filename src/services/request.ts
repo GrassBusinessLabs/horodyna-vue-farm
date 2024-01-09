@@ -1,5 +1,15 @@
 import {apiService} from '@/services/api'
-import type {AddPostBody, CurrentUser, LoginBody, Post, createOffer, changeOffer, RegisterBody} from '@/models'
+import type {
+   AddPostBody,
+   CurrentUser,
+   LoginBody,
+   Post,
+   createOffer,
+   changeOffer,
+   RegisterBody,
+   createFarms,
+   farmResponce
+} from '@/models'
 
 export const requestService = () => {
    const api = apiService()
@@ -37,8 +47,14 @@ export const requestService = () => {
    async function createOffer(body: createOffer) {
       return api.post('/offers', body)
    }
+   async function createFarms(body: createFarms) {
+      return api.post('/farms', body)
+   }
    async function getOffers() {
       return api.get('/offers')
+   }
+   async function getFarms():Promise<farmResponce> {
+      return api.get('/farms')
    }
    async function getOfferById(id: any) {
       return api.get(`/offers/${id}`)
@@ -60,6 +76,8 @@ export const requestService = () => {
       getOffers,
       changeOffer,
       getOfferById,
-      deleteOffer
+      deleteOffer,
+      createFarms,
+      getFarms
    }
 }

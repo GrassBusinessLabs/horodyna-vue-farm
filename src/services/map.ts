@@ -23,6 +23,7 @@ export type SearchAddress = Address & AddressCountrySubdivisionCodeMixin & Addre
 export interface AddressItem {
    address: string
    details: FuzzySearchResult
+
 }
 
 export interface CityItem {
