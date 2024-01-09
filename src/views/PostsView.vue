@@ -1,6 +1,8 @@
 <template>
    <home-layout>
-      <v-btn class="custom-btn w-100 mb-2nmp " @click="bottomSheetOpen = true">Додати товар</v-btn>
+      <v-btn v-if="userFarms && userFarms.length > 0" class="custom-btn w-100 mb-2nmp" @click="bottomSheetOpen = true">Додати товар</v-btn>
+      <v-btn v-else @click="addAdress">Додати адресу</v-btn>
+
       <v-bottom-sheet v-model="bottomSheetOpen">
 
 
@@ -215,8 +217,18 @@ import HomeLayout from '@/layouts/HomeLayout.vue'
 
 import AppSelectImgExample from '@/components/AppSelectImgExample.vue'
 import {useOffersStore} from '@/stores/offers-store.ts'
+import {useFarmStore} from '@/stores/farm-store.ts'
+import router from '@/router'
 
 
+
+
+
+
+const farmStore = useFarmStore()
+const {populateFarms} = farmStore
+const {farms}=storeToRefs(farmStore)
+populateFarms()
 
 const linkIMG = 'https://horodyna.grassbusinesslabs.tk/static/'
 const offersStore = useOffersStore()
@@ -232,7 +244,9 @@ const EditSheet = ref(false)
 
 const categories = ref<string[]>([])
 const namecategories = [{UA: 'Овочі', EN: 'Vegetables'}, {UA: 'Риба', EN: 'Fish'}, {UA: 'Заморожена їда', EN: 'Frozen food'}, {UA: 'Фрукти', EN: 'Fruits'}, {UA: 'Випічка', EN: 'Bakery'}, {UA: 'Солодощі', EN: 'Sweets'}, {UA: 'Здорове харчування', EN: 'Healthy food'}, {UA: "М'ясо", EN: 'Meat'}, {UA: 'Молочні продукти', EN: 'Dairy products'}]
-
+function addAdress() {
+   router.replace("/add-address")
+}
 let bodyOffer:createOffer = reactive({
    title: '',
    farm_id: Date.now(),
@@ -247,6 +261,7 @@ let bodyOffer:createOffer = reactive({
    unit: '',
    stock: 0
 })
+
 
 let bodyChangeOffer:changeOffer = reactive({
    id: 0,
@@ -494,7 +509,7 @@ const addPostLocal = () => {
    myUnit.value = ''
    myStock.value = 0
 }
-
+const userFarms = farms.value?.items.filter(farm=>farm.user.id===currentUser.value?.id)
 
 </script>
 

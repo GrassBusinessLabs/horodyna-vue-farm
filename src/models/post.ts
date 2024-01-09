@@ -26,6 +26,34 @@ export interface AddPostBody {
    userId: number
 
 }
+export  interface createFarms{
+   name: string
+   city: string
+   address: string
+   latitude: number
+   longitude: number
+}
+export  interface farmResponce{
+   items:[{
+      id: number
+      name: string
+      city: string
+      address: string
+      latitude: number
+      longitude: number
+      user:{
+         id: number,
+         name: string,
+         email: string
+
+      }
+   }
+
+
+   ]
+   total: number
+   pages: number
+}
 export interface createOffer{
    title: string,
    description: string,
