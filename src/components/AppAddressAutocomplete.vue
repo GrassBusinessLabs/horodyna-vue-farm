@@ -53,10 +53,14 @@ populate()
 
 const { currentUser } = storeToRefs(userStore)
 const farmStore = useFarmStore()
+
 const {populateFarms} = farmStore
-const {farms}=storeToRefs(farmStore)
+// const {farms}=storeToRefs(farmStore)
+
 populateFarms()
-const userFarms = farms.value?.items.filter(farm=>farm.user.id===currentUser.value?.id)
+console.log(farmStore.farms.items.filter(farm=>farm.user.id===userStore.currentUser?.id))
+const userFarms = farmStore.farms.items.filter(farm=>farm.user.id===currentUser.value?.id)
+console.log(userFarms)
 const emit = defineEmits<{
    (e: 'select', address: AddressItem): void
 }>()

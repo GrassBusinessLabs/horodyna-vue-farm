@@ -1,7 +1,11 @@
 <template>
    <home-layout>
       <v-btn v-if="userFarms && userFarms.length > 0" class="custom-btn w-100 mb-2nmp" @click="bottomSheetOpen = true">Додати товар</v-btn>
-      <v-btn v-else @click="addAdress">Додати адресу</v-btn>
+      <div v-else>
+         <p>У вас немає ферми, додайте адресу</p>
+         <v-btn  @click="addAdress">Додати адресу</v-btn>
+      </div>
+
 
       <v-bottom-sheet v-model="bottomSheetOpen">
 
@@ -16,6 +20,14 @@
 
             <v-form @submit.prevent='addPostLocal'>
             <v-row class='ma-0'>
+
+               <v-col cols='12'>
+                  <v-select
+                     v-model="bodyOffer.farm_id"
+                     :items="idfarms"
+                     label="Ферма"
+                  ></v-select>
+               </v-col>
                <v-col cols='12'>
                   <v-text-field
                      v-model='bodyOffer.title'
@@ -87,6 +99,13 @@
 
             <v-form @submit.prevent='addPostLocal'>
                <v-row class='ma-0'>
+                  <v-col cols='12'>
+                     <v-select
+                        v-model="bodyOffer.farm_id"
+                        :items="idfarms"
+                        label="Ферма"
+                     ></v-select>
+                  </v-col>
                   <v-col cols='12'>
                      <v-text-field
                         v-model='bodyChangeOffer.title'
@@ -224,12 +243,17 @@ import router from '@/router'
 
 
 
+const userStore = useUserStore()
+
+const {currentUser} = storeToRefs(userStore)
 
 const farmStore = useFarmStore()
 const {populateFarms} = farmStore
 const {farms}=storeToRefs(farmStore)
 populateFarms()
+const {populate} = userStore
 
+populate()
 const linkIMG = 'https://horodyna.grassbusinesslabs.tk/static/'
 const offersStore = useOffersStore()
 const myText = ref("")
@@ -241,15 +265,44 @@ const myUnit = ref("")
 const myStock = ref(0)
 const bottomSheetOpen = ref(false)
 const EditSheet = ref(false)
+const userFarms = farms.value?.items.filter(farm=>farm.user.id===currentUser.value?.id)
+let y  = []
+let idfarms = []
 
 const categories = ref<string[]>([])
 const namecategories = [{UA: 'Овочі', EN: 'Vegetables'}, {UA: 'Риба', EN: 'Fish'}, {UA: 'Заморожена їда', EN: 'Frozen food'}, {UA: 'Фрукти', EN: 'Fruits'}, {UA: 'Випічка', EN: 'Bakery'}, {UA: 'Солодощі', EN: 'Sweets'}, {UA: 'Здорове харчування', EN: 'Healthy food'}, {UA: "М'ясо", EN: 'Meat'}, {UA: 'Молочні продукти', EN: 'Dairy products'}]
+// const userFarms = farmStore.farms.items.filter(farm=>farm.user.id===userStore.currentUser?.id)
+
+const promise = new Promise((resolve, reject) => {
+   resolve(userFarms)
+})
+async function getMyFarm() {
+   const result = await promise
+   y = result
+   console.log(result)
+   return y
+
+
+
+}
+getMyFarm()
+setTimeout(() => {
+   for(let i of y){
+      console.log(i.id)
+      idfarms.push(i.id)
+   }
+
+}, 10)
+
+
+
+
 function addAdress() {
    router.replace("/add-address")
 }
 let bodyOffer:createOffer = reactive({
    title: '',
-   farm_id: Date.now(),
+   farm_id: 0,
    description: '',
    image: {
       name: '',
@@ -305,7 +358,7 @@ let bodyChangeOffer:changeOffer = reactive({
 }
 async function addOffer(){
    const bodyT : createOffer = {
-      farm_id: 9,
+      farm_id: bodyOffer.farm_id,
       title: bodyOffer.title,
       description: bodyOffer.description,
       image: {
@@ -428,8 +481,8 @@ const units = ['кг', 'шт']
 
 const {handleError} = useHandleError()
 const {translate} = useAppI18n()
-const userStore = useUserStore()
-const {currentUser} = storeToRefs(userStore)
+
+
 
 const request = requestService()
 
@@ -509,7 +562,7 @@ const addPostLocal = () => {
    myUnit.value = ''
    myStock.value = 0
 }
-const userFarms = farms.value?.items.filter(farm=>farm.user.id===currentUser.value?.id)
+console.log(userFarms)
 
 </script>
 
