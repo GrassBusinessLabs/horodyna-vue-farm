@@ -29,15 +29,26 @@
 
                <v-col cols='12'>
                   <v-btn
-                     class='mt-2'
+                     class='mt-2 app-color'
                      :block='true'
                      :disabled='isSubmitting'
                      type='submit'
-                     color='primary'
                   >
                      Вхід
                   </v-btn>
                </v-col>
+              <v-col
+                  cols='12'
+                  class='d-flex justify-center pb-0'
+                  @click='toRegister'
+              >
+                Немає аккаунту?
+                <v-list-item-title
+                    class='pa-0 ml-1 h-auto w-auto text-capitalize text-blue-accent-4'
+                >
+                  Реєстрація
+                </v-list-item-title>
+              </v-col>
             </v-row>
          </v-form>
       </v-sheet>
@@ -56,6 +67,7 @@ import {useHandleError, useRouting} from '@/composables'
 import {authTokenService, formService, requestService} from '@/services'
 import {useUserStore} from '@/stores'
 import AuthLayout from '@/layouts/AuthLayout.vue'
+import router from "@/router";
 
 const {handleError} = useHandleError()
 const routing = useRouting()
@@ -84,6 +96,10 @@ const [username, usernameAttrs] = form.defineField('email' as MaybeRefOrGetter, 
 const [password, passwordAttrs] = form.defineField('password' as MaybeRefOrGetter, vuetifyConfig)
 
 const showPassword = ref<boolean>(false)
+
+const toRegister = () => {
+  router.replace("/register")
+}
 
 const submit = form.handleSubmit(async values => {
   try {

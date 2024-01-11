@@ -1,21 +1,17 @@
 <template>
-   <v-card>
-      <p><b>Ім'я:</b> {{ name }}</p>
-      <p><b>Прізвище:</b> {{ surname }}</p>
-      <p><b>Номер телефону:</b> {{ phoneNumber }}</p>
-      <p><b>Email:</b> {{ email }}</p>
-      <p><b>Адреса:</b> {{ addressModel?.address }}</p>
+   <v-btn @click="sheet =!sheet">Додати ферму</v-btn>
+   <v-card v-for="farm in userFarms" :key="farm.id">
+      <p><b>Ім'я:</b> {{ farm.name }}</p>
+      <p><b>Адреса:</b> {{ farm.address }}</p>
+
       
       <v-btn @click="editData(),  sheet =!sheet" color="primary" class="d-flex justify-center ma-6 mx-auto">Редагувати</v-btn>
-      
    </v-card>
    <v-bottom-sheet v-model="sheet">
       <v-card height="500">
       <v-form @submit.prevent="saveData">
-         <v-text-field v-model="name" label="Ім'я"></v-text-field>
-         <v-text-field v-model="surname" label="Прізвище"></v-text-field>
-         <v-text-field v-model="phoneNumber" label="Номер телефону"></v-text-field>
-         <v-text-field v-model="email" label="Email"></v-text-field>
+         <v-text-field v-model="name" label="Назва ферми"></v-text-field>
+
          <v-autocomplete
          v-model='addressModel'
          v-model:search='searchModel'
@@ -32,22 +28,61 @@
          @update:search='debounceSearch'
       />
       <app-map v-if="addressModel" />
-         <v-btn type="submit" color="primary" @click = "sheet =!sheet">Зберегти</v-btn>
+         <v-btn type="submit" color="primary" @click = "addFarm">Зберегти</v-btn>
       </v-form>
    </v-card>
    </v-bottom-sheet>
 </template>
 
 <script lang='ts' setup>
-import { defineEmits, ref } from 'vue'
+import {ref} from 'vue'
 import debounce from "lodash.debounce"
 import AppMap from './AppMap.vue'
 import type { AddressItem } from '@/services/map'
 import { mapService } from '@/services/map'
+import type {createFarms} from '@/models'
+import {requestService} from '@/services'
+import {useFarmStore} from '@/stores/farm-store.ts'
+import {storeToRefs} from 'pinia'
+import {useUserStore} from '@/stores'
 
+const userStore = useUserStore()
+const {populate} = userStore
+
+populate()
+
+const { currentUser } = storeToRefs(userStore)
+const farmStore = useFarmStore()
+
+const {populateFarms} = farmStore
+// const {farms}=storeToRefs(farmStore)
+
+populateFarms()
+
+const userFarms = farmStore.farms?.items.filter(farm=>farm.user.id===currentUser.value?.id)
+console.log(userFarms)
 const emit = defineEmits<{
    (e: 'select', address: AddressItem): void
 }>()
+const request = requestService()
+
+
+const addFarm = () => {
+   const spliteedAdress =addressModel.value?addressModel.value?.address.split(","):'error'
+   const city = spliteedAdress[2]
+   const body:createFarms = {
+
+      name: name.value,
+      city: city,
+      address: spliteedAdress[0]+", "+ spliteedAdress[1],
+      latitude: 122.21,
+      longitude: 122.21
+   }
+
+   request.createFarms(body)
+   sheet.value=false
+
+}
 const sheet = ref(false)
 const map = mapService()
 const name = ref(localStorage.getItem('name') || '')
@@ -78,9 +113,12 @@ const items = ref<AddressItem[] | undefined>([])
 
 const debounceSearch = debounce(search, 1000)
 
+
 function selectHandler(event: AddressItem): void {
    emit('select', event)
+
 }
+
 
 async function search(value: string | null): Promise<void> {
    try {
@@ -103,6 +141,7 @@ async function search(value: string | null): Promise<void> {
       loading.value = false
    }
 }
+console.log(addressModel.value?.address)
 </script>
 
 <style lang='scss' scoped>
