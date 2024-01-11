@@ -64,15 +64,14 @@ import type { Ref } from 'vue'
 import { ref } from 'vue'
 
 import type { farmResponce } from '@/models'
-import { authTokenService, requestService } from '@/services'
-import { useHandleError, useRouting } from '@/composables'
+
+import { useHandleError } from '@/composables'
 
 export const useFarmStore = defineStore('farm', () => {
    const { handleError } = useHandleError()
-   const routing = useRouting()
 
-   const request = requestService()
-   const authToken = authTokenService()
+
+
 
    // Получение данных из localStorage при инициализации, если они там есть
    const savedFarms = localStorage.getItem('farms')
@@ -86,24 +85,11 @@ export const useFarmStore = defineStore('farm', () => {
       localStorage.setItem('farms', JSON.stringify(value))
    }
 
-   async function getFarmsData(): Promise<farmResponce | null> {
-      try {
-         const farmsData: farmResponce = await request.getFarms()
-         setFarms(farmsData)
 
-         return farms.value
-      } catch (e) {
-         console.error(e)
-         handleError(e)
-         return null
-      }
-   }
 
    async function populateFarms(): Promise<void> {
       try {
-         const token: string | null = await authToken.get()
 
-         const userData: farmResponce | null = await getFarmsData()
       } catch (e) {
          console.error(e)
          handleError(e)

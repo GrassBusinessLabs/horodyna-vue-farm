@@ -181,13 +181,13 @@
       <v-row>
          <v-col cols='12' v-for='i of offersStore.offers'>
             <v-card
-               class='pa-4'
+               class='pa-4 h-auto'
                outlined
             >
                <div class="image-container">
                   <img width="128" :src="linkIMG + '/' + i.image" alt="FFF" class="center-image">
                </div>
-               <div class="title-container">
+               <div class="title-container mt-4">
                   <p><h2>{{i.title}}</h2></p>
                </div>
                <p class='mb-2'><b>Опис: </b>{{i.description}}</p>
@@ -266,14 +266,14 @@ const myStock = ref(0)
 const bottomSheetOpen = ref(false)
 const EditSheet = ref(false)
 const userFarms = farms.value?.items.filter(farm=>farm.user.id===currentUser.value?.id)
-let y  = []
-let idfarms = []
+let y:any  = []
+let idfarms:any = []
 
 const categories = ref<string[]>([])
 const namecategories = [{UA: 'Овочі', EN: 'Vegetables'}, {UA: 'Риба', EN: 'Fish'}, {UA: 'Заморожена їда', EN: 'Frozen food'}, {UA: 'Фрукти', EN: 'Fruits'}, {UA: 'Випічка', EN: 'Bakery'}, {UA: 'Солодощі', EN: 'Sweets'}, {UA: 'Здорове харчування', EN: 'Healthy food'}, {UA: "М'ясо", EN: 'Meat'}, {UA: 'Молочні продукти', EN: 'Dairy products'}]
 // const userFarms = farmStore.farms.items.filter(farm=>farm.user.id===userStore.currentUser?.id)
 
-const promise = new Promise((resolve, reject) => {
+const promise = new Promise((resolve) => {
    resolve(userFarms)
 })
 async function getMyFarm() {

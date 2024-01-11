@@ -35,12 +35,12 @@
 </template>
 
 <script lang='ts' setup>
-import {defineEmits, reactive, ref} from 'vue'
+import {ref} from 'vue'
 import debounce from "lodash.debounce"
 import AppMap from './AppMap.vue'
 import type { AddressItem } from '@/services/map'
 import { mapService } from '@/services/map'
-import type {createFarms, createOffer} from '@/models'
+import type {createFarms} from '@/models'
 import {requestService} from '@/services'
 import {useFarmStore} from '@/stores/farm-store.ts'
 import {storeToRefs} from 'pinia'
@@ -58,8 +58,8 @@ const {populateFarms} = farmStore
 // const {farms}=storeToRefs(farmStore)
 
 populateFarms()
-console.log(farmStore.farms.items.filter(farm=>farm.user.id===userStore.currentUser?.id))
-const userFarms = farmStore.farms.items.filter(farm=>farm.user.id===currentUser.value?.id)
+
+const userFarms = farmStore.farms?.items.filter(farm=>farm.user.id===currentUser.value?.id)
 console.log(userFarms)
 const emit = defineEmits<{
    (e: 'select', address: AddressItem): void
@@ -68,7 +68,7 @@ const request = requestService()
 
 
 const addFarm = () => {
-   const spliteedAdress = addressModel.value?.address.split(",")
+   const spliteedAdress =addressModel.value?addressModel.value?.address.split(","):'error'
    const city = spliteedAdress[2]
    const body:createFarms = {
 
