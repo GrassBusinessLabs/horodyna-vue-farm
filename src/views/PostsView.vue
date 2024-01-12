@@ -72,7 +72,7 @@
                      variant="outlined"
                  >
                    <template v-slot:item="{ props, item }">
-                     <v-list-item v-bind="props" :subtitle="item.raw.name"></v-list-item>
+                     <v-list-item v-bind="props" :subtitle="item.title"></v-list-item>
                    </template>
                  </v-select>
                </v-col>
