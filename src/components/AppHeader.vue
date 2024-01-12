@@ -29,7 +29,7 @@
          <v-card-text>
 
            <v-btn class='mt-2' :block='true' type='button' variant='text' @click='goToMain'>
-             <v-icon size='23'>mdi:chevron-right</v-icon>
+
              {{ translate('BTNS.MAINPAGE') }}
            </v-btn>
 
