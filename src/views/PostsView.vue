@@ -400,7 +400,7 @@ const categories = ref<string[]>([
    'Баклажан', 
    'Диня',
    'Цибуля',
-   'Інше'
+   'інше'
 ])
 // const namecategories = [{UA: 'Овочі', EN: 'Vegetables'}, {UA: 'Риба', EN: 'Fish'}, {UA: 'Заморожена їда', EN: 'Frozen food'}, {UA: 'Фрукти', EN: 'Fruits'}, {UA: 'Випічка', EN: 'Bakery'}, {UA: 'Солодощі', EN: 'Sweets'}, {UA: 'Здорове харчування', EN: 'Healthy food'}, {UA: "М'ясо", EN: 'Meat'}, {UA: 'Молочні продукти', EN: 'Dairy products'}]
 // const userFarms = farmStore.farms.items.filter(farm=>farm.user.id===userStore.currentUser?.id)
