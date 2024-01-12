@@ -345,6 +345,7 @@ const addFarm = () => {
   sheet.value=false
 
 }
+populateFarms()
 async function search(value: string | null): Promise<void> {
   try {
     loading.value = true
