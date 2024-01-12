@@ -21,7 +21,7 @@
      <v-bottom-sheet v-model="sheet">
        <v-card height="500">
          <v-form @submit.prevent="saveData">
-           <v-text-field v-model="name" label="Назва ферми"></v-text-field>
+           <v-text-field v-model="name" label="Назва ферми:"></v-text-field>
 
            <v-autocomplete
                v-model='addressModel'
