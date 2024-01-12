@@ -1,16 +1,20 @@
 <template>
-   <v-btn @click="sheet =!sheet">Додати ферму</v-btn>
-   <v-card v-for="farm in userFarms" :key="farm.id">
-      <p><b>Ім'я:</b> {{ farm.name }}</p>
-      <p><b>Адреса:</b> {{ farm.address }}</p>
+   <v-btn @click="sheet =!sheet" class="custom-btn w-100 mb-2nmp">Додати ферму</v-btn>
+   <v-card class="ma-5 ramka" v-for="farm in userFarms" :key="farm.id">
 
-      
-      <v-btn @click="editData(),  sheet =!sheet" color="primary" class="d-flex justify-center ma-6 mx-auto">Редагувати</v-btn>
+     <div class="ma-5">
+
+     <p class="title-container mt-4 ma-3"><b>{{ farm.name }}</b></p>
+       <div class="ramka">
+      <p class="title-container">{{ farm.address }}</p>
+     </div>
+     </div>
+
    </v-card>
    <v-bottom-sheet v-model="sheet">
       <v-card height="500">
       <v-form @submit.prevent="saveData">
-         <v-text-field v-model="name" label="Назва ферми"></v-text-field>
+         <v-text-field v-model="name" label="Назва ферми" ></v-text-field>
 
          <v-autocomplete
          v-model='addressModel'
@@ -28,7 +32,7 @@
          @update:search='debounceSearch'
       />
       <app-map v-if="addressModel" />
-         <v-btn type="submit" color="primary" @click = "addFarm">Зберегти</v-btn>
+         <v-btn type="submit" color="primary" @click = "addFarm" class="custom-btn w-100 mb-2nmp">Зберегти</v-btn>
       </v-form>
    </v-card>
    </v-bottom-sheet>
@@ -149,4 +153,11 @@ console.log(addressModel.value?.address)
 .v-bottom-sheet-overlay {
    display: none;
 }
+
+.ramka{
+  border-radius: 30px;
+  border-style: solid;
+  border-bottom-color: #236fc4;
+}
+
 </style>

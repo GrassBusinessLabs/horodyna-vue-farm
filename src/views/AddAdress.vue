@@ -1,8 +1,9 @@
 <template>
    <home-layout>
-      <h1 class="centered-text">Мій профіль</h1>
+      <h1 class="centered-text">Моя ферма</h1>
       <app-map-example />
    </home-layout>
+
 </template>
 <script lang='ts' setup>
 import AppMapExample from '@/components/AppMapExample.vue'
