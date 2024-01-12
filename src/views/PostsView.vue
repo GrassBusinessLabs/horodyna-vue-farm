@@ -1,12 +1,48 @@
 <template>
    <home-layout>
       <v-btn v-if="userFarms && userFarms.length > 0" class="custom-btn w-100 mb-2nmp" @click="bottomSheetOpen = true">Додати товар</v-btn>
-      <div v-else>
-         <p>У вас немає ферми, додайте адресу</p>
-         <v-btn  @click="addAdress">Додати адресу</v-btn>
-      </div>
+     <v-btn v-else class="custom-btn w-100 mb-2nmp" @click="sheet = true">Додати товар</v-btn>
 
 
+<!--     <v-bottom-sheet v-model="address">-->
+<!--       <v-card title="Створення ферми">-->
+<!--         <v-row class='ma-0'>-->
+<!--           <v-col cols='12'>-->
+<!--             <p>У вас немає ферми, додайте адресу та назву ферми!</p>-->
+<!--             <v-btn @click="addAdress">Додати адресу</v-btn>-->
+<!--           </v-col>-->
+
+<!--         </v-row>-->
+<!--       </v-card>-->
+<!--       <div>-->
+
+<!--       </div>-->
+<!--     </v-bottom-sheet >-->
+     <v-bottom-sheet v-model="sheet">
+       <v-card height="500">
+         <v-form @submit.prevent="saveData">
+           <v-text-field v-model="name" label="Назва ферми"></v-text-field>
+
+           <v-autocomplete
+               v-model='addressModel'
+               v-model:search='searchModel'
+               :items='items'
+               :loading='loading'
+               autocomplete='off'
+               item-title='address'
+               label='Address'
+               prepend-inner-icon='mdi-map-marker-outline'
+               :no-filter='true'
+               :hide-details='true'
+               :return-object='true'
+               @update:modelValue='selectHandler'
+               @update:search='debounceSearch'
+           />
+           <app-map v-if="addressModel" />
+           <v-btn type="submit" color="primary" @click = "addFarm">Зберегти</v-btn>
+         </v-form>
+       </v-card>
+     </v-bottom-sheet>
       <v-bottom-sheet v-model="bottomSheetOpen">
 
 
@@ -237,7 +273,11 @@ import HomeLayout from '@/layouts/HomeLayout.vue'
 import AppSelectImgExample from '@/components/AppSelectImgExample.vue'
 import {useOffersStore} from '@/stores/offers-store.ts'
 import {useFarmStore} from '@/stores/farm-store.ts'
-import router from '@/router'
+
+import AppMap from "@/components/AppMap.vue";
+import {AddressItem, mapService} from "@/services/map.ts";
+import debounce from "lodash.debounce";
+import {createFarms} from "@/models";
 
 
 
@@ -258,19 +298,93 @@ const linkIMG = 'https://horodyna.grassbusinesslabs.tk/static/'
 const offersStore = useOffersStore()
 const myText = ref("")
 const myPhoto = ref("")
+const map = mapService()
 const myTitle = ref("")
 const myCategory = ref("")
 const myPrice = ref(0)
 const myUnit = ref("")
 const myStock = ref(0)
 const bottomSheetOpen = ref(false)
+const sheet = ref(false)
+const name = ref(localStorage.getItem('name') || '')
+const loading = ref<boolean>(false)
+const addressModel = ref<AddressItem | null>(null)
+const searchModel = ref<string | undefined>(undefined)
+const items = ref<AddressItem[] | undefined>([])
+
 const EditSheet = ref(false)
 const userFarms = farms.value?.items.filter(farm=>farm.user.id===currentUser.value?.id)
 let y:any  = []
 let idfarms:any = []
 
-const categories = ref<string[]>([])
-const namecategories = [{UA: 'Овочі', EN: 'Vegetables'}, {UA: 'Риба', EN: 'Fish'}, {UA: 'Заморожена їда', EN: 'Frozen food'}, {UA: 'Фрукти', EN: 'Fruits'}, {UA: 'Випічка', EN: 'Bakery'}, {UA: 'Солодощі', EN: 'Sweets'}, {UA: 'Здорове харчування', EN: 'Healthy food'}, {UA: "М'ясо", EN: 'Meat'}, {UA: 'Молочні продукти', EN: 'Dairy products'}]
+const saveData = () => {
+  localStorage.setItem('name', name.value)
+
+
+
+  localStorage.setItem('adress', addressModel?.value?.address ? addressModel?.value?.address: "Error")
+
+}
+const debounceSearch = debounce(search, 1000)
+const emit = defineEmits<{
+  (e: 'select', address: AddressItem): void
+}>()
+const addFarm = () => {
+  const spliteedAdress =addressModel.value?addressModel.value?.address.split(","):'error'
+  const city = spliteedAdress[2]
+  const body:createFarms = {
+
+    name: name.value,
+    city: city,
+    address: spliteedAdress[0]+","+ spliteedAdress[1]+","+ spliteedAdress[2],
+    latitude: 122.21,
+    longitude: 122.21
+  }
+
+  request.createFarms(body)
+  sheet.value=false
+
+}
+async function search(value: string | null): Promise<void> {
+  try {
+    loading.value = true
+
+    const searchValue: string = value?.trim() || ''
+
+    if (!searchValue) {
+      items.value = []
+      loading.value = false
+      return
+    }
+
+    items.value = await map.searchAddresses(searchValue)
+
+    loading.value = false
+  } catch (e) {
+    console.error(e)
+    items.value = []
+    loading.value = false
+  }
+}
+function selectHandler(event: AddressItem): void {
+  emit('select', event)
+
+}
+const categories = ref<string[]>([ 
+   'Яблуко','Картопля', 
+   'Ковбаса', 
+   'Мед', 
+   'Груша', 
+   'Помідор', 
+   'Сало', 
+   'Агрус', 
+   'Абрикос', 
+   'Баклажан', 
+   'Диня',
+   'Цибуля',
+   'Інше'
+])
+// const namecategories = [{UA: 'Овочі', EN: 'Vegetables'}, {UA: 'Риба', EN: 'Fish'}, {UA: 'Заморожена їда', EN: 'Frozen food'}, {UA: 'Фрукти', EN: 'Fruits'}, {UA: 'Випічка', EN: 'Bakery'}, {UA: 'Солодощі', EN: 'Sweets'}, {UA: 'Здорове харчування', EN: 'Healthy food'}, {UA: "М'ясо", EN: 'Meat'}, {UA: 'Молочні продукти', EN: 'Dairy products'}]
 // const userFarms = farmStore.farms.items.filter(farm=>farm.user.id===userStore.currentUser?.id)
 
 const promise = new Promise((resolve) => {
@@ -297,9 +411,9 @@ setTimeout(() => {
 
 
 
-function addAdress() {
-   router.replace("/add-address")
-}
+// function addAdress() {
+//    router.replace("/add-address")
+// }
 let bodyOffer:createOffer = reactive({
    title: '',
    farm_id: 0,
@@ -519,28 +633,28 @@ const isSubmitting = ref<boolean>(false)
 // }
 
 
-const getCategories = () => {
-   try  {
-      request.getCategories().then((response) => {
-         for (let i of response.data){
-            for(let j of namecategories){
-               if (i.name === j.EN){
-                  categories.value.push(j.UA)
-               }
-            }
-
-
-         }
-
-      })
-   } catch (e) {
-      console.error(e)
-      handleError(e)
-   }
-}
-onMounted(() => {
-   getCategories()
-})
+// const getCategories = () => {
+//    try  {
+//       request.getCategories().then((response) => {
+//          for (let i of response.data){
+//             for(let j of namecategories){
+//                if (i.name === j.EN){
+//                   categories.value.push(j.UA)
+//                }
+//             }
+//
+//
+//          }
+//
+//       })
+//    } catch (e) {
+//       console.error(e)
+//       handleError(e)
+//    }
+// }
+// onMounted(() => {
+//    getCategories()
+// })
 
 const addPostLocal = () => {
    const body: AddPostBody = {
