@@ -74,7 +74,7 @@ const addFarm = () => {
 
       name: name.value,
       city: city,
-      address: spliteedAdress[0]+", "+ spliteedAdress[1],
+      address: spliteedAdress[0]+","+ spliteedAdress[1]+","+ spliteedAdress[2],
       latitude: 122.21,
       longitude: 122.21
    }
@@ -83,6 +83,7 @@ const addFarm = () => {
    sheet.value=false
 
 }
+
 const sheet = ref(false)
 const map = mapService()
 const name = ref(localStorage.getItem('name') || '')
