@@ -64,8 +64,7 @@
 <!--                     label="Ферма"-->
 <!--                  ></v-select>-->
                  <v-select
-                     :items="idfarms"
-
+                      :items="idfarms"
                      label="Ферма"
                      item-title="id"
                      v-model="bodyOffer.farm_id"
@@ -148,11 +147,17 @@
             <v-form @submit.prevent='addPostLocal'>
                <v-row class='ma-0'>
                   <v-col cols='12'>
-                     <v-select
-                        v-model="bodyOffer.farm_id"
+                    <v-select
                         :items="idfarms"
                         label="Ферма"
-                     ></v-select>
+                        item-title="id"
+                        v-model="bodyOffer.farm_id"
+                        variant="outlined"
+                    >
+                      <template v-slot:item="{ props, item }">
+                        <v-list-item v-bind="props" :subtitle="item.title"></v-list-item>
+                      </template>
+                    </v-select>
                   </v-col>
                   <v-col cols='12'>
                      <v-text-field
@@ -395,7 +400,7 @@ const categories = ref<string[]>([
    'Баклажан', 
    'Диня',
    'Цибуля',
-   'Інше'
+   'інше'
 ])
 // const namecategories = [{UA: 'Овочі', EN: 'Vegetables'}, {UA: 'Риба', EN: 'Fish'}, {UA: 'Заморожена їда', EN: 'Frozen food'}, {UA: 'Фрукти', EN: 'Fruits'}, {UA: 'Випічка', EN: 'Bakery'}, {UA: 'Солодощі', EN: 'Sweets'}, {UA: 'Здорове харчування', EN: 'Healthy food'}, {UA: "М'ясо", EN: 'Meat'}, {UA: 'Молочні продукти', EN: 'Dairy products'}]
 // const userFarms = farmStore.farms.items.filter(farm=>farm.user.id===userStore.currentUser?.id)
