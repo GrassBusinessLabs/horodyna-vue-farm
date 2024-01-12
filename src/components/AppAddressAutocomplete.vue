@@ -1,6 +1,6 @@
 <template>
    <v-btn @click="sheet =!sheet" class="custom-btn w-100 mb-2nmp">Додати ферму</v-btn>
-   <v-card class="ma-5 ramka" v-for="farm in userFarms" :key="farm.id">
+   <v-card class="ma-5 ramka" v-for="farm in getMyFarm()" :key="farm.id">
 
      <div class="ma-5">
 
@@ -39,7 +39,7 @@
 </template>
 
 <script lang='ts' setup>
-import {ref} from 'vue'
+import { ref} from 'vue'
 import debounce from "lodash.debounce"
 import AppMap from './AppMap.vue'
 import type { AddressItem } from '@/services/map'
@@ -57,21 +57,24 @@ populate()
 
 const { currentUser } = storeToRefs(userStore)
 const farmStore = useFarmStore()
-
+console.log(farmStore.farms)
 const {populateFarms} = farmStore
 // const {farms}=storeToRefs(farmStore)
 
 populateFarms()
+function getMyFarm (){
+  const userFarms = farmStore.farms?.items.filter(farm=>farm.user.id===currentUser.value?.id)
+  return userFarms
+}
 
-const userFarms = farmStore.farms?.items.filter(farm=>farm.user.id===currentUser.value?.id)
-console.log(userFarms)
+console.log(getMyFarm ())
 const emit = defineEmits<{
    (e: 'select', address: AddressItem): void
 }>()
 const request = requestService()
 
 
-const addFarm = () => {
+const addFarm = async () => {
    const spliteedAdress =addressModel.value?addressModel.value?.address.split(","):'error'
    const city = spliteedAdress[2]
    const body:createFarms = {
@@ -83,7 +86,9 @@ const addFarm = () => {
       longitude: 122.21
    }
 
-   request.createFarms(body)
+  await request.createFarms(body)
+  await request.getFarms()
+   getMyFarm()
    sheet.value=false
 
 }
@@ -107,9 +112,7 @@ const saveData = () => {
    editing.value = false
 }
 
-const editData = () => {
-   editing.value = true
-}
+
 
 const loading = ref<boolean>(false)
 const addressModel = ref<AddressItem | null>(null)
@@ -157,7 +160,7 @@ console.log(addressModel.value?.address)
 .ramka{
   border-radius: 30px;
   border-style: solid;
-  border-bottom-color: #236fc4;
+  border-color: #236fc4;
 }
 
 </style>

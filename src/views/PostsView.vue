@@ -21,7 +21,7 @@
      <v-bottom-sheet v-model="sheet">
        <v-card height="500">
          <v-form @submit.prevent="saveData">
-           <v-text-field v-model="name" label="Назва ферми:"></v-text-field>
+           <v-text-field  v-model="name" label="Назва ферми:"></v-text-field>
 
            <v-autocomplete
                v-model='addressModel'
@@ -58,11 +58,23 @@
             <v-row class='ma-0'>
 
                <v-col cols='12'>
-                  <v-select
-                     v-model="bodyOffer.farm_id"
+<!--                  <v-select-->
+<!--                     v-model="bodyOffer.farm_id"-->
+<!--                     :items="idfarms"-->
+<!--                     label="Ферма"-->
+<!--                  ></v-select>-->
+                 <v-select
                      :items="idfarms"
+
                      label="Ферма"
-                  ></v-select>
+                     item-title="id"
+                     v-model="bodyOffer.farm_id"
+                     variant="outlined"
+                 >
+                   <template v-slot:item="{ props, item }">
+                     <v-list-item v-bind="props" :subtitle="item.raw.name"></v-list-item>
+                   </template>
+                 </v-select>
                </v-col>
                <v-col cols='12'>
                   <v-text-field
@@ -397,14 +409,12 @@ async function getMyFarm() {
    console.log(result)
    return y
 
-
-
 }
 getMyFarm()
 setTimeout(() => {
    for(let i of y){
       console.log(i.id)
-      idfarms.push(i.id)
+      idfarms.push({id:i.id,name:i.name})
    }
 
 }, 10)
