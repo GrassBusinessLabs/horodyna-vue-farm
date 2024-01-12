@@ -1,6 +1,6 @@
 <template>
    <v-app-bar color='primary'>
-      <v-btn icon @click="toggleSidebar" v-if="route.path !== '/sign-in' && route.path !== '/add-address'" >
+      <v-btn icon @click="toggleSidebar" v-if="route.path !== '/sign-in' && route.path !== '/add-address' &&route.path !== '/register'" >
         <v-icon>mdi-menu</v-icon>
       </v-btn>
 
@@ -20,17 +20,21 @@
       >
         <v-list-item-title class='my-subtitle app-font-regular'>{{ currentUser?.name }}</v-list-item-title>
         <v-list-item-subtitle class='my-font-size'>{{ currentUser?.email }}</v-list-item-subtitle>
+        <template v-slot:append>
+        </template>
       </v-list-item>
-
+     <v-divider thickness='2'></v-divider>
       <v-card class='mx-auto' rounded='lg'>
 
          <v-card-text>
 
            <v-btn class='mt-2' :block='true' type='button' variant='text' @click='goToMain'>
+             <v-icon size='23'>mdi:chevron-right</v-icon>
              {{ translate('BTNS.MAINPAGE') }}
            </v-btn>
 
            <v-btn class='mt-2' :block='true' type='button' variant='text' @click='addAdress'>
+
              {{ translate('BTNS.ADD') }}
            </v-btn>
 
@@ -118,5 +122,9 @@ function addAdress() {
 
 .avatar {
    border-radius: 50%;
+}
+
+.my-padding {
+  padding: 11.6px;
 }
 </style>

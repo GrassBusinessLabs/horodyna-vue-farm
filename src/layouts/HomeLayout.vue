@@ -9,6 +9,7 @@
 
                <v-col>
                   <v-sheet
+                      style="background-color: #f0f0f0;"
                      min-height='70vh'
                      rounded='lg'
                   >
