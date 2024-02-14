@@ -1,5 +1,5 @@
 <template>
-   <registration-layout>
+   <registration-layout style="background-color: #f0f0f0;">
       <v-sheet class='mx-auto pa-6 rounded-lg' width='350'>
          <v-form @submit.prevent='submit'>
             <v-row>

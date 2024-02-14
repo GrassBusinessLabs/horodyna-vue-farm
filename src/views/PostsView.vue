@@ -3,21 +3,6 @@
       <v-btn v-if="userFarms && userFarms.length > 0" class="custom-btn w-100 mb-2nmp" @click="bottomSheetOpen = true">Додати товар</v-btn>
      <v-btn v-else class="custom-btn w-100 mb-2nmp" @click="sheet = true">Додати товар</v-btn>
 
-
-<!--     <v-bottom-sheet v-model="address">-->
-<!--       <v-card title="Створення ферми">-->
-<!--         <v-row class='ma-0'>-->
-<!--           <v-col cols='12'>-->
-<!--             <p>У вас немає ферми, додайте адресу та назву ферми!</p>-->
-<!--             <v-btn @click="addAdress">Додати адресу</v-btn>-->
-<!--           </v-col>-->
-
-<!--         </v-row>-->
-<!--       </v-card>-->
-<!--       <div>-->
-
-<!--       </div>-->
-<!--     </v-bottom-sheet >-->
      <v-bottom-sheet v-model="sheet">
        <v-card height="500">
          <v-form @submit.prevent="saveData">
@@ -43,26 +28,15 @@
          </v-form>
        </v-card>
      </v-bottom-sheet>
+
+
+
       <v-bottom-sheet v-model="bottomSheetOpen">
-
-
-
-
-
-         <v-card
-            title="Інформація про товар"
-         >
+         <v-card title="Інформація про товар">
             <app-select-img-example/>
-
             <v-form @submit.prevent='addPostLocal'>
             <v-row class='ma-0'>
-
                <v-col cols='12'>
-<!--                  <v-select-->
-<!--                     v-model="bodyOffer.farm_id"-->
-<!--                     :items="idfarms"-->
-<!--                     label="Ферма"-->
-<!--                  ></v-select>-->
                  <v-select
                       :items="idfarms"
                      label="Ферма"
@@ -138,6 +112,9 @@
             </v-row>
          </v-form></v-card>
       </v-bottom-sheet>
+
+
+
       <v-bottom-sheet v-model="EditSheet">
          <v-card
             title="Редагування товару"
@@ -231,7 +208,7 @@
 <!--         {{i.unit}}-->
 <!--         {{i.stock}}-->
 <!--      </div>-->
-      <v-row>
+      <v-row class='mt-4'>
          <v-col cols='12' v-for='i of offersStore.offers'>
             <v-card
                class='pa-4 h-auto'

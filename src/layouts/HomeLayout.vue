@@ -1,12 +1,10 @@
 <template>
-   <v-layout class='rounded rounded-md'>
+   <v-layout>
       <app-header />
       
       <v-main class='bg-grey-lighten-3'>
          <v-container>
             <v-row>
-
-
                <v-col>
                   <v-sheet
                       style="background-color: #f0f0f0;"

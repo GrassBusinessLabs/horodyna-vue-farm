@@ -12,7 +12,6 @@
    </v-app-bar>
 
    <v-navigation-drawer v-model="sidebarOpen" app >
-      <!-- Sidebar content goes here -->
 
       <v-list-item
          prepend-avatar='https://randomuser.me/api/portraits/men/78.jpg'
