@@ -204,33 +204,40 @@
             <v-card
                class='pa-4 h-auto'
                outlined
+
             >
-               <div class="image-container">
-                  <img width="128" :src="linkIMG + '/' + i.image" alt="FFF" class="center-image">
+               <div  >
+                  <div class="image-container">
+                     <img width="128" :src="linkIMG + '/' + i.image" alt="FFF" class="center-image">
+                  </div>
+                  <div class="title-container">
+                     <p><h2>{{i.title}}</h2></p>
+                  </div>
+                  <p class='mb-2'><b>Опис: </b>{{i.description}}</p>
+                  <p class='mb-2'><b>Категорія: </b> {{i.category}}</p>
+                  <p class='mb-2'><b>Ціна: </b>{{i.price}}</p>
+                  <p class='mb-2'><b>Одиниця: </b>{{i.unit}}</p>
+                  <p class='mb-2'><b>Запас: </b>{{i.stock}}</p>
+
+                  <v-switch
+                     v-model="i.status"
+
+                     hide-details
+                     color="primary"
+
+                     :label='i.status ==true?"Є в наявності":"Немає в наявності"'
+
+                  ></v-switch>
+
+                  <div @click='updateNameImageNow(i.image); offersStore.nowOffer = i'>
+                     <v-card-actions class='d-flex justify-space-between' >
+                        <v-btn class="custom-btn" @click="offersStore.croppedImage = null ,EditSheet = true, console.log(nameImage), imageServerToBase64()" >Редагувати</v-btn>
+                        <v-btn class="custom-btn delete-btn" @click="deleteOffer(i.id)">Видалити</v-btn>
+                     </v-card-actions>
+                  </div>
+
                </div>
-               <div class="title-container mt-4">
-                  <p><h2>{{i.title}}</h2></p>
-               </div>
-               <p class='mb-2'><b>Опис: </b>{{i.description}}</p>
-               <p class='mb-2'><b>Категорія: </b> {{i.category}}</p>
-               <p class='mb-2'><b>Ціна: </b>{{i.price}}</p>
-               <p class='mb-2'><b>Одиниця: </b>{{i.unit}}</p>
-               <p class='mb-2'><b>Запас: </b>{{i.stock}}</p>
 
-               <v-switch
-                  v-model="i.status"
-
-               hide-details
-                  color="primary"
-
-               :label='i.status ==true?"Є в наявності":"Немає в наявності"'
-
-               ></v-switch>
-
-               <v-card-actions class='d-flex justify-space-between'>
-                  <v-btn class="custom-btn" @click="offersStore.nowOffer = i, offersStore.croppedImage = null ,EditSheet = true">Редагувати</v-btn>
-                  <v-btn class="custom-btn delete-btn" @click="deleteOffer(i.id)">Видалити</v-btn>
-               </v-card-actions>
 
             </v-card>
          </v-col>
@@ -243,7 +250,7 @@
 <script lang='ts' setup>
 
 
-import {onMounted, reactive, ref} from 'vue'
+import {onMounted, reactive, ref, watch} from 'vue'
 
 
 import {storeToRefs} from 'pinia'
@@ -266,7 +273,7 @@ import {createFarms} from "@/models";
 
 
 const userStore = useUserStore()
-
+const nameImage = ref("")
 const {currentUser} = storeToRefs(userStore)
 
 const farmStore = useFarmStore()
@@ -298,6 +305,10 @@ const userFarms = farms.value?.items.filter(farm=>farm.user.id===currentUser.val
 let y:any  = []
 let idfarms:any = []
 
+const updateNameImageNow = (imageName: string) => {
+   offersStore.nameImageNow = imageName
+}
+
 const saveData = () => {
   localStorage.setItem('name', name.value)
 
@@ -306,6 +317,34 @@ const saveData = () => {
   localStorage.setItem('adress', addressModel?.value?.address ? addressModel?.value?.address: "Error")
 
 }
+
+
+
+const imageServerToBase64 = () => {
+   setTimeout(() => {
+      const imagePath = `https://horodyna.grassbusinesslabs.tk/static/${offersStore.nameImageNow}`;
+
+      fetch(imagePath)
+         .then(response => response.blob())
+         .then(blob => {
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = () => {
+               offersStore.nowImageBase64 = reader.result;
+            };
+         })
+         .catch(error => {
+            console.error('Помилка завантаження зображення:', error);
+         });
+   }, 50)
+
+
+}
+
+
+
+
+
 const debounceSearch = debounce(search, 1000)
 const emit = defineEmits<{
   (e: 'select', address: AddressItem): void
@@ -405,6 +444,7 @@ let bodyOffer:createOffer = reactive({
 
 
 async function addOffer(){
+
    const body : createOffer = {
       farm_id: bodyOffer.farm_id,
       title: bodyOffer.title,
@@ -440,8 +480,27 @@ async function deleteOffer(id: any) {
    }
 }
 async function changeOffer() {
+   const base64String = offersStore.nowImageBase64; // Ваш рядок base64
+   const base64Parts = base64String.split(';base64,');
+   const base64Name = base64Parts[0].split(':')[1]; // Отримання імені (наприклад, "image/jpeg")
+   const base64Data = base64Parts[1]; // Отримання base64-даних
+   const body: changeOffer = reactive({
+      id: offersStore.nowOffer.id,
+      title: offersStore.nowOffer.title,
+      description: offersStore.nowOffer.description,
+      category: offersStore.nowOffer.category,
+      price: +offersStore.nowOffer.price,
+      status: offersStore.nowOffer.status,
+      unit: offersStore.nowOffer.unit,
+      stock: +offersStore.nowOffer.stock,
+      farm_id: offersStore.nowOffer.farm_id,
+      image: {
+         name: base64Name,
+         data: base64Data
+      }
+   })
    try {
-      const response = await request.changeOffer(offersStore.nowOffer)
+      const response = await request.changeOffer(body)
       await getOffer()
       EditSheet.value = false
       console.log(response)

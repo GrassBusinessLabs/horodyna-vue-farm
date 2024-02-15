@@ -3,14 +3,17 @@ import {changeOffer} from '@/models'
 interface State {
    offers: changeOffer[],
    nowOffer: changeOffer[],
-   croppedImage: any
+   croppedImage: any,
+   nowImageBase64: string | null,
+   nameImageNow: string | null
 }
 export const useOffersStore = defineStore({id: 'offers',
    state: (): State => ({
       offers: [],
       nowOffer: [],
-      croppedImage: null
-
+      croppedImage: null,
+      nowImageBase64: null,
+      nameImageNow: null
    })
 
 

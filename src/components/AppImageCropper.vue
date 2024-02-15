@@ -42,6 +42,9 @@
 <script lang='ts' setup>
 import {defineEmits, defineExpose, ref} from 'vue'
 import VueCropper from 'vue-cropperjs'
+import {useOffersStore} from '@/stores/offers-store.ts'
+
+const OfferStore = useOffersStore()
 
 interface CroppedCanvasOptions {
    width: number
@@ -110,6 +113,8 @@ async function convertToBase64(file: File): Promise<string> {
          // Perform a null check before resolving the promise
          if (reader.result !== null && typeof reader.result === 'string') {
             resolve(reader.result)
+            OfferStore.nowImageBase64 = reader.result
+
          } else {
             reject(new Error('Failed to read file as string'))
          }
@@ -126,6 +131,7 @@ async function convertToBase64(file: File): Promise<string> {
 .image-container {
    max-width: 450px;
    max-height: 300px;
+   overflow: hidden;
 
    & img {
       width: 100%;
