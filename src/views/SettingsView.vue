@@ -7,6 +7,7 @@
          <app-setting
             v-for="setting in settings"
             :setting='setting'
+            class='menu-item-setting'
             :key="setting.title"
             @click="showSettingSheet(setting.title)"
          ></app-setting>
@@ -43,16 +44,27 @@
             </v-list>
          </v-card>
       </v-bottom-sheet>
+
+      <v-bottom-sheet v-model='changePasswordSheet'>
+         <v-card title='Змінити пароль'>
+            <v-card-text>
+               <v-text-field label='Старий пароль'  v-model='passwords.oldPassword' type='password'></v-text-field>
+               <v-text-field label='Новий пароль'  v-model='passwords.newPassword' type='password'></v-text-field>
+            </v-card-text>
+            <v-card-actions class='d-flex justify-center'>
+               <v-btn color='primary' class='w-100' @click='changePasswordFun()'>Змінити</v-btn>
+            </v-card-actions>
+         </v-card>
+      </v-bottom-sheet>
    </settings-layout>
 </template>
 
 <script lang='ts' setup>
 import SettingsLayout from '@/layouts/SettingsLayout.vue'
 import AppSetting from '@/components/AppSetting.vue'
-import {ref} from 'vue'
+import {reactive, ref} from 'vue'
 import {useUserStore} from '@/stores'
 import {storeToRefs} from 'pinia'
-
 interface SettingItem {
    title: string
    category: string
@@ -61,6 +73,12 @@ interface SettingItem {
    icon: string
    routing?: Function
 }
+
+interface ChangePassword {
+   oldPassword: string,
+   newPassword: string
+}
+
 
 const settings = [
    {title: 'Аккаунт', icon: 'mdi-account-outline'},
@@ -74,7 +92,7 @@ const settings = [
 const switchValue = ref(false)
 
 const sheet = ref(false)
-
+const changePasswordSheet = ref(false)
 const category = ref('')
 
 const userStore = useUserStore()
@@ -89,10 +107,25 @@ const showSettingSheet = (settingCategory: string) => {
    filteredItems.value = settingsItems.filter(item => item.category === category.value)
 }
 
+const passwords: ChangePassword = reactive({
+   oldPassword: '',
+   newPassword: ''
+})
+
+const changePasswordFun = async () => {
+  await userStore.changePassword(passwords)
+   changePasswordSheet.value = false
+}
+
+const openSheetChangePassword = () => {
+   changePasswordSheet.value = true
+   sheet.value = false
+}
+
 const settingsItems: SettingItem[] = [
    {title: `Ім'я:`, category: 'Аккаунт', value: currentUser?.value?.name, showSwitch: false, icon: ''},
    {title: 'Email:', category: 'Аккаунт', value: currentUser?.value?.email, showSwitch: false, icon: ''},
-   {title: 'Змінити пароль', category: 'Аккаунт', value: '', showSwitch: false, icon: 'mdi-chevron-right'},
+   {title: 'Змінити пароль', category: 'Аккаунт', value: '', showSwitch: false, icon: 'mdi-chevron-right', routing: openSheetChangePassword},
    {title: 'Вийти з аккаунту', category: 'Аккаунт', value: '', showSwitch: false, icon: 'mdi-chevron-right', routing: userStore.logout},
    {title: 'Сповіщати', category: 'Повідомлення', value: '', showSwitch: true, icon: ''},
 ]
@@ -102,9 +135,15 @@ const settingsItems: SettingItem[] = [
 <style lang='scss' scoped>
 .my-border {
    border-bottom: 3px solid rgba(128, 128, 128, 0.4);
+   margin: 5px;
+   border-radius: 15px;
 }
 
 .v-card-title {
    background-color: #135DD8;
+}
+.menu-item-setting{
+   margin: 5px;
+   border-radius: 15px;
 }
 </style>

@@ -8,7 +8,7 @@ import type {
    changeOffer,
    RegisterBody,
    createFarms,
-   farmResponce
+   farmResponce, ChangePassword
 } from '@/models'
 
 export const requestService = () => {
@@ -26,6 +26,10 @@ export const requestService = () => {
    async function addPost(body: AddPostBody): Promise<Post> {
       // WARNING!!! This request only simulates adding a new post
       return api.post('/posts', body)
+   }
+
+   async function changePassword(body: ChangePassword): Promise<ChangePassword> {
+      return api.post('/auth/change-pwd', body)
    }
 
    async function register(body: RegisterBody): Promise<CurrentUser> {
@@ -66,6 +70,7 @@ export const requestService = () => {
       return api.del(`/offers/${id}`)
    }
    return {
+      changePassword,
       login,
       register,
       createOffer,

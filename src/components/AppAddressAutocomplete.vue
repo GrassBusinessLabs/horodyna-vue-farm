@@ -1,39 +1,44 @@
 <template>
    <v-btn @click="sheet =!sheet" class="custom-btn w-100 mb-2nmp">Додати ферму</v-btn>
-   <v-card class="ma-5 ramka" v-for="farm in getMyFarm()" :key="farm.id">
+   <v-card class="ma-5 ramka " v-for="farm in getMyFarm()" :key="farm.id">
 
      <div class="ma-5">
 
-     <p class="title-container mt-4 ma-3"><b>{{ farm.name }}</b></p>
-       <div class="ramka">
-      <p class="title-container">{{ farm.address }}</p>
-     </div>
+        <p class="title-container mt-4 ma-3"><b>{{ farm.name }}</b></p>
+         <div class="ramka">
+            <p class="title-container">{{ farm.address }}</p>
+         </div>
      </div>
 
    </v-card>
    <v-bottom-sheet v-model="sheet">
-      <v-card height="500">
-      <v-form @submit.prevent="saveData">
-         <v-text-field v-model="name" label="Назва ферми" ></v-text-field>
+      <v-card >
+         <v-card-text>
+            <v-form @submit.prevent="saveData">
+               <v-text-field v-model="name" label="Назва ферми" ></v-text-field>
 
-         <v-autocomplete
-         v-model='addressModel'
-         v-model:search='searchModel'
-         :items='items'
-         :loading='loading'
-         autocomplete='off'
-         item-title='address'
-         label='Address'
-         prepend-inner-icon='mdi-map-marker-outline'
-         :no-filter='true'
-         :hide-details='true'
-         :return-object='true'
-         @update:modelValue='selectHandler'
-         @update:search='debounceSearch'
-      />
-      <app-map v-if="addressModel" />
-         <v-btn type="submit" color="primary" @click = "addFarm" class="custom-btn w-100 mb-2nmp">Зберегти</v-btn>
-      </v-form>
+               <v-autocomplete
+                  v-model='addressModel'
+                  v-model:search='searchModel'
+                  :items='items'
+                  :loading='loading'
+                  autocomplete='off'
+                  item-title='address'
+                  label='Address'
+                  prepend-inner-icon='mdi-map-marker-outline'
+                  :no-filter='true'
+                  :hide-details='true'
+                  :return-object='true'
+                  @update:modelValue='selectHandler'
+                  @update:search='debounceSearch'
+               />
+            </v-form>
+         </v-card-text>
+         <app-map />
+         <v-card-actions>
+            <v-btn type="submit" color="primary" @click = "addFarm()" class="custom-btn w-100">Зберегти</v-btn>
+         </v-card-actions>
+
    </v-card>
    </v-bottom-sheet>
 </template>
@@ -57,20 +62,19 @@ populate()
 
 const { currentUser } = storeToRefs(userStore)
 const farmStore = useFarmStore()
-console.log(farmStore.farms)
+
 const {populateFarms} = farmStore
-// const {farms}=storeToRefs(farmStore)
+
 
 populateFarms()
 function getMyFarm (){
-  const userFarms = farmStore.farms?.items.filter(farm=>farm.user.id===currentUser.value?.id)
-  return userFarms
+   return farmStore.farms?.items.filter(farm => farm.user.id === currentUser.value?.id)
 }
 
-console.log(getMyFarm ())
 const emit = defineEmits<{
    (e: 'select', address: AddressItem): void
 }>()
+
 const request = requestService()
 
 
@@ -86,9 +90,8 @@ const addFarm = async () => {
       longitude: 122.21
    }
 
-  await request.createFarms(body)
-  await request.getFarms()
-   getMyFarm()
+   await request.createFarms(body)
+   await populateFarms()
    sheet.value=false
 
 }
@@ -99,7 +102,6 @@ const name = ref(localStorage.getItem('name') || '')
 const surname = ref(localStorage.getItem('surname') || '')
 const phoneNumber = ref(localStorage.getItem('phoneNumber') || '')
 const email = ref(localStorage.getItem('email') || '')
-// const adress = ref(localStorage.getItem('adress') || '')
 const editing = ref(false)
 
 const saveData = () => {
@@ -124,24 +126,19 @@ const debounceSearch = debounce(search, 1000)
 
 function selectHandler(event: AddressItem): void {
    emit('select', event)
-
 }
 
 
 async function search(value: string | null): Promise<void> {
    try {
       loading.value = true
-
       const searchValue: string = value?.trim() || ''
-
       if (!searchValue) {
          items.value = []
          loading.value = false
          return
       }
-
       items.value = await map.searchAddresses(searchValue)
-
       loading.value = false
    } catch (e) {
       console.error(e)
@@ -149,7 +146,7 @@ async function search(value: string | null): Promise<void> {
       loading.value = false
    }
 }
-console.log(addressModel.value?.address)
+
 </script>
 
 <style lang='scss' scoped>
@@ -158,6 +155,8 @@ console.log(addressModel.value?.address)
 }
 
 .ramka{
+   width: 100%;
+   padding: 15px;
   border-radius: 30px;
   border-style: solid;
   border-color: #236fc4;

@@ -8,3 +8,8 @@ export interface CurrentUser {
    token: string
    name: string
 }
+
+export interface ChangePassword {
+   oldPassword: string,
+   newPassword: string
+}

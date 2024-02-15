@@ -1,12 +1,16 @@
 import {defineStore} from 'pinia'
 import {changeOffer} from '@/models'
 interface State {
-   offers: changeOffer[]
+   offers: changeOffer[],
+   nowOffer: changeOffer[],
+   croppedImage: any
 }
-export const useOffersStore = defineStore({
-   id: 'offers',
+export const useOffersStore = defineStore({id: 'offers',
    state: (): State => ({
-      offers: []
+      offers: [],
+      nowOffer: [],
+      croppedImage: null
+
    })
 
 

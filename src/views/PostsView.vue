@@ -116,9 +116,7 @@
 
 
       <v-bottom-sheet v-model="EditSheet">
-         <v-card
-            title="Редагування товару"
-         >
+         <v-card title="Редагування товару">
             <app-select-img-example/>
 
             <v-form @submit.prevent='addPostLocal'>
@@ -128,7 +126,7 @@
                         :items="idfarms"
                         label="Ферма"
                         item-title="id"
-                        v-model="bodyOffer.farm_id"
+                        v-model="offersStore.nowOffer.farm_id"
                         variant="outlined"
                     >
                       <template v-slot:item="{ props, item }">
@@ -138,14 +136,14 @@
                   </v-col>
                   <v-col cols='12'>
                      <v-text-field
-                        v-model='bodyChangeOffer.title'
+                        v-model='offersStore.nowOffer.title'
                         label='Додати назву'
                         type='text'
                      ></v-text-field>
                   </v-col>
                   <v-col cols='12'>
                      <v-text-field
-                        v-model='bodyChangeOffer.description'
+                        v-model='offersStore.nowOffer.description'
                         label='Додати опис'
                         type='text'
                      ></v-text-field>
@@ -153,7 +151,7 @@
 
                   <v-col cols='12'>
                      <v-select
-                        v-model="bodyChangeOffer.category"
+                        v-model="offersStore.nowOffer.category"
                         :items="categories"
                         label="Категорія"
                      ></v-select>
@@ -161,7 +159,7 @@
 
                   <v-col cols='12'>
                      <v-text-field
-                        v-model='bodyChangeOffer.price'
+                        v-model='offersStore.nowOffer.price'
                         label='Ціна'
                         type="Number"
                      ></v-text-field>
@@ -169,7 +167,7 @@
                   </v-col>
                   <v-col cols='12'>
                      <v-select
-                        v-model="bodyChangeOffer.unit"
+                        v-model="offersStore.nowOffer.unit"
                         :items="units"
                         label="Одиниця"
                      ></v-select>
@@ -177,7 +175,7 @@
 
                   <v-col cols='12'>
                      <v-text-field
-                        v-model='bodyChangeOffer.stock'
+                        v-model='offersStore.nowOffer.stock'
                         label='Запас'
                         type='number'
                      ></v-text-field>
@@ -199,14 +197,8 @@
                </v-row>
             </v-form></v-card>
       </v-bottom-sheet>
-<!--      <div v-for='i of offersStore.offers'>-->
-<!--         {{i.title}}-->
-<!--         {{i.description}}-->
-<!--         {{i.category}}-->
-<!--         {{i.price}}-->
-<!--         {{i.unit}}-->
-<!--         {{i.stock}}-->
-<!--      </div>-->
+
+
       <v-row class='mt-4'>
          <v-col cols='12' v-for='i of offersStore.offers'>
             <v-card
@@ -235,8 +227,8 @@
 
                ></v-switch>
 
-               <v-card-actions>
-                  <v-btn class="custom-btn" @click="idFromOffer(i.id)">Редагувати</v-btn>
+               <v-card-actions class='d-flex justify-space-between'>
+                  <v-btn class="custom-btn" @click="offersStore.nowOffer = i, offersStore.croppedImage = null ,EditSheet = true">Редагувати</v-btn>
                   <v-btn class="custom-btn delete-btn" @click="deleteOffer(i.id)">Видалити</v-btn>
                </v-card-actions>
 
@@ -273,9 +265,6 @@ import debounce from "lodash.debounce";
 import {createFarms} from "@/models";
 
 
-
-
-
 const userStore = useUserStore()
 
 const {currentUser} = storeToRefs(userStore)
@@ -285,7 +274,6 @@ const {populateFarms} = farmStore
 const {farms}=storeToRefs(farmStore)
 populateFarms()
 const {populate} = userStore
-
 populate()
 const linkIMG = 'https://horodyna.grassbusinesslabs.tk/static/'
 const offersStore = useOffersStore()
@@ -378,8 +366,7 @@ const categories = ref<string[]>([
    'Цибуля',
    'інше'
 ])
-// const namecategories = [{UA: 'Овочі', EN: 'Vegetables'}, {UA: 'Риба', EN: 'Fish'}, {UA: 'Заморожена їда', EN: 'Frozen food'}, {UA: 'Фрукти', EN: 'Fruits'}, {UA: 'Випічка', EN: 'Bakery'}, {UA: 'Солодощі', EN: 'Sweets'}, {UA: 'Здорове харчування', EN: 'Healthy food'}, {UA: "М'ясо", EN: 'Meat'}, {UA: 'Молочні продукти', EN: 'Dairy products'}]
-// const userFarms = farmStore.farms.items.filter(farm=>farm.user.id===userStore.currentUser?.id)
+
 
 const promise = new Promise((resolve) => {
    resolve(userFarms)
@@ -401,11 +388,6 @@ setTimeout(() => {
 }, 10)
 
 
-
-
-// function addAdress() {
-//    router.replace("/add-address")
-// }
 let bodyOffer:createOffer = reactive({
    title: '',
    farm_id: 0,
@@ -422,48 +404,8 @@ let bodyOffer:createOffer = reactive({
 })
 
 
-let bodyChangeOffer:changeOffer = reactive({
-   id: 0,
-   title: '',
-   description: '',
-   category: '',
-   price: 0,
-   status: true,
-   unit: '',
-   stock: +0,
-   farm_id: +0,
-   image: {
-      name: "",
-      data: ''
-   }
-})
-
-
- async function idFromOffer(id: any) {
-   const response = await request.getOfferById(id)
-    bodyChangeOffer = reactive({
-       id: id,
-       title:response.title,
-       description: response.description,
-       category: response.category,
-       price: +response.price,
-       status: response.status,
-       unit: response.unit,
-       stock: Number(response.stock),
-       farm_id: response.farm_id,
-       image: {
-          name: localStorage.getItem('fileName'),
-          data: localStorage.getItem('croppedImg')
-       }
- })
-
-   console.log(id)
-   EditSheet.value = true
-
-
-}
 async function addOffer(){
-   const bodyT : createOffer = {
+   const body : createOffer = {
       farm_id: bodyOffer.farm_id,
       title: bodyOffer.title,
       description: bodyOffer.description,
@@ -475,8 +417,9 @@ async function addOffer(){
       unit: bodyOffer.unit,
       stock: +bodyOffer.stock
    }
+
    try{
-      const response = await request.createOffer(bodyT)
+      const response = await request.createOffer(body)
       await getOffer()
       console.log(response)
 
@@ -497,25 +440,9 @@ async function deleteOffer(id: any) {
    }
 }
 async function changeOffer() {
-   const bodySend = {
-      id: bodyChangeOffer.id,
-      title: bodyChangeOffer.title,
-      description: bodyChangeOffer.description,
-      category: bodyChangeOffer.category,
-      price: +bodyChangeOffer.price,
-      status: bodyChangeOffer.status,
-      unit: bodyChangeOffer.unit,
-      stock: +bodyChangeOffer.stock,
-      farm_id: bodyChangeOffer.farm_id,
-      image: {
-         name: bodyChangeOffer.image.name,
-         data: bodyChangeOffer.image.data
-      }
-   }
    try {
-      const response = await request.changeOffer(bodySend)
+      const response = await request.changeOffer(offersStore.nowOffer)
       await getOffer()
-
       EditSheet.value = false
       console.log(response)
    }
@@ -524,51 +451,8 @@ async function changeOffer() {
    }
 }
 
-// async function changeOffer() {
-//    const changed = {
-//
-//    }
-// }
-// async function changeOffers(offer:changeOffer){
-//    bodyOffer.title = offer.title
-//    bodyOffer.description = offer.description
-//    bodyOffer.image.name = offer.image.name
-//    bodyOffer.image.data = offer.image.data
-//    bodyOffer.category = offer.category
-//    bodyOffer.price = offer.price
-//    bodyOffer.unit = offer.unit
-//    bodyOffer.stock = offer.stock
-//
-//    const bodyT : changeOffer = {
-//
-//       farm_id: offer.farm_id,
-//       id: offer.id,
-//       title: offer.title,
-//       description: offer.description,
-//       image: {
-//          name: offer.image.name,
-//          data: offer.image.data},
-//       category: offer.category,
-//       price: +offer.price,
-//       status: offer.status,
-//       unit: offer.unit,
-//       stock: +offer.stock
-//    }
-//    try{
-//       const response = await request.changeOffer(bodyT)
-//
-//       console.log(response)
-//
-//    }catch (e) {
-//       console.error(e)
-//       handleError(e)
-//    }
-// }
-
 async function getOffer(){
-
    try{
-
       const response = await request.getOffers()
       offersStore.offers = response.items
       status.value = response.items.status
@@ -581,72 +465,15 @@ async function getOffer(){
 }
 
 onMounted(() => {getOffer()})
+
 const status = ref(true)
-
 const units = ['кг', 'шт']
-
 const {handleError} = useHandleError()
 const {translate} = useAppI18n()
-
-
-
 const request = requestService()
-
-
 const loadingPosts = ref<boolean>(false)
-
-
-
 const posts = ref<AddPostBody[]>([])
-
-
-
 const isSubmitting = ref<boolean>(false)
-
-// onMounted(() => {
-//    loadPosts()
-// })
-
-// async function loadPosts(): Promise<void> {
-//    try {
-//       loadingPosts.value = true
-//
-//       const response: GetPostsResponse = await request.getPosts()
-//       posts.value = response.posts
-//       lastPostId = response.total
-//
-//       loadingPosts.value = false
-//    } catch (e) {
-//       console.error(e)
-//       handleError(e)
-//       posts.value = []
-//       loadingPosts.value = false
-//    }
-// }
-
-
-// const getCategories = () => {
-//    try  {
-//       request.getCategories().then((response) => {
-//          for (let i of response.data){
-//             for(let j of namecategories){
-//                if (i.name === j.EN){
-//                   categories.value.push(j.UA)
-//                }
-//             }
-//
-//
-//          }
-//
-//       })
-//    } catch (e) {
-//       console.error(e)
-//       handleError(e)
-//    }
-// }
-// onMounted(() => {
-//    getCategories()
-// })
 
 const addPostLocal = () => {
    const body: AddPostBody = {

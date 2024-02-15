@@ -77,7 +77,7 @@ import { defineStore } from 'pinia'
 import type { Ref } from 'vue'
 import { ref } from 'vue'
 
-import type { CurrentUser } from '@/models'
+import type {ChangePassword, CurrentUser} from '@/models'
 import { authTokenService, requestService } from '@/services'
 import { useHandleError, useRouting } from '@/composables'
 
@@ -97,6 +97,16 @@ export const useUserStore = defineStore('user', () => {
       currentUser.value = value
       // Сохранение данных в localStorage при обновлении
       localStorage.setItem('currentUser', JSON.stringify(value))
+   }
+
+   async function changePassword(body: ChangePassword): Promise <void> {
+      try {
+         const res = await request.changePassword(body)
+         console.log(res)
+
+      } catch (e) {
+         console.log(e)
+      }
    }
 
    async function getUserData(): Promise<CurrentUser | null> {
@@ -148,6 +158,7 @@ export const useUserStore = defineStore('user', () => {
    }
 
    return {
+      changePassword,
       currentUser,
       setCurrentUser,
       populate,

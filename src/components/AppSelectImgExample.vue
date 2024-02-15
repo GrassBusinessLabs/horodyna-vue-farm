@@ -15,10 +15,12 @@
    <v-col cols='12'>
       <img
          class='cropped-img'
-         v-if='croppedImg'
-         :src='croppedImg'
+         v-if='OfferStore.croppedImage'
+         :src='OfferStore.croppedImage'
          alt='Cropped image'
       >
+
+      <img class='cropped-img' :src='linkIMG+OfferStore.nowOffer.image' v-else>
 
    </v-col>
 
@@ -38,10 +40,13 @@ import {ref} from 'vue'
 
 import type {ImageCropperComponent} from '@/components/AppImageCropper.vue'
 import AppImageCropper from '@/components/AppImageCropper.vue'
+import {useOffersStore} from '@/stores/offers-store.ts'
 
+const OfferStore = useOffersStore()
+const linkIMG = 'https://horodyna.grassbusinesslabs.tk/static/'
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const imageCropperRef = ref<ImageCropperComponent | null>(null)
-const croppedImg = ref<string | null>(null)
+
 
 function chooseFile(): void {
    if (fileInputRef.value) {
@@ -69,7 +74,8 @@ async function openImageCropper(event: Event): Promise<void> {
 }
 
 function cropHandler(img: string): void {
-   croppedImg.value = img
+
+   OfferStore.croppedImage = img
 }
 </script>
 

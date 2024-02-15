@@ -96,7 +96,6 @@ function hideCropper(): void {
 }
 
 async function cropChosenImage(): Promise<void> {
-   // localStorage.setItem(croppedImg, 'croppedImg.value')
    emit('crop', cropper.value!.getCroppedCanvas().toDataURL(imageFileType.value!))
    hideCropper()
 }
