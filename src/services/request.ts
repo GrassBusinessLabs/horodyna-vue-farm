@@ -57,6 +57,9 @@ export const requestService = () => {
    async function getOffers() {
       return api.get('/offers')
    }
+   async function getFarmById(id: number) {
+      return api.get(`/farms/${id}`)
+   }
    async function getFarms():Promise<farmResponce> {
       return api.get('/farms')
    }
@@ -75,6 +78,7 @@ export const requestService = () => {
       register,
       createOffer,
       getCategories,
+      getFarmById,
       getCurrentUser,
       logout,
       addPost,

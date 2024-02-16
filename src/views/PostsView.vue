@@ -1,7 +1,14 @@
 <template>
    <home-layout>
-      <v-btn v-if="userFarms && userFarms.length > 0" class="custom-btn w-100 mb-2nmp" @click="bottomSheetOpen = true">Додати товар</v-btn>
+      <v-btn v-if="userFarms && userFarms.length > 0" class="custom-btn w-100 mb-2" @click="bottomSheetOpen = true; offersStore.nowOffer = []">Додати товар</v-btn>
      <v-btn v-else class="custom-btn w-100 mb-2nmp" @click="sheet = true">Додати товар</v-btn>
+
+      <v-card >
+         <v-card-text>
+            <p v-if="farmStore.nowFarm">{{ `Адреса знаходження: ${farmStore.nowFarm.address}` }}</p>
+            <p @click='changeFarm = !changeFarm'>Змінити</p>
+         </v-card-text>
+      </v-card>
 
      <v-bottom-sheet v-model="sheet">
        <v-card height="500">
@@ -29,6 +36,28 @@
        </v-card>
      </v-bottom-sheet>
 
+      <v-bottom-sheet v-model='changeFarm'>
+         <v-card title='Виберіть ферму'>
+            <v-card-text>
+               <v-row>
+                  <v-col cols='12'>
+                     <v-select
+                        :items="farmStore.farmsId"
+                        label="Ферма"
+                        item-title="id"
+                        v-model="farmStore.nowFarm.id"
+                        variant="outlined"
+
+                     >
+                        <template v-slot:item="{ props, item }">
+                           <v-list-item v-bind="props" :subtitle="item.raw.address" @click='changeFarmFun(item.raw.id)'></v-list-item>
+                        </template>
+                     </v-select>
+                  </v-col>
+               </v-row>
+            </v-card-text>
+         </v-card>
+      </v-bottom-sheet>
 
 
       <v-bottom-sheet v-model="bottomSheetOpen">
@@ -36,19 +65,7 @@
             <app-select-img-example/>
             <v-form @submit.prevent='addPostLocal'>
             <v-row class='ma-0'>
-               <v-col cols='12'>
-                 <v-select
-                      :items="idfarms"
-                     label="Ферма"
-                     item-title="id"
-                     v-model="bodyOffer.farm_id"
-                     variant="outlined"
-                 >
-                   <template v-slot:item="{ props, item }">
-                     <v-list-item v-bind="props" :subtitle="item.title"></v-list-item>
-                   </template>
-                 </v-select>
-               </v-col>
+
                <v-col cols='12'>
                   <v-text-field
                      v-model='bodyOffer.title'
@@ -121,6 +138,16 @@
 
             <v-form @submit.prevent='addPostLocal'>
                <v-row class='ma-0'>
+                  <v-col cols='12'>
+                     <v-switch
+                        v-model="offersStore.nowOffer.status"
+                        hide-details
+                        color="primary"
+                        :label='offersStore.nowOffer.status ==true?"Є в наявності":"Немає в наявності"'
+
+                     ></v-switch>
+                  </v-col>
+
                   <v-col cols='12'>
                     <v-select
                         :items="idfarms"
@@ -219,15 +246,7 @@
                   <p class='mb-2'><b>Одиниця: </b>{{i.unit}}</p>
                   <p class='mb-2'><b>Запас: </b>{{i.stock}}</p>
 
-                  <v-switch
-                     v-model="i.status"
 
-                     hide-details
-                     color="primary"
-
-                     :label='i.status ==true?"Є в наявності":"Немає в наявності"'
-
-                  ></v-switch>
 
                   <div @click='updateNameImageNow(i.image); offersStore.nowOffer = i'>
                      <v-card-actions class='d-flex justify-space-between' >
@@ -288,6 +307,8 @@ const myText = ref("")
 const myPhoto = ref("")
 const map = mapService()
 const myTitle = ref("")
+const changeFarm = ref(false)
+const myFarms = ref([])
 const myCategory = ref("")
 const myPrice = ref(0)
 const myUnit = ref("")
@@ -299,6 +320,14 @@ const loading = ref<boolean>(false)
 const addressModel = ref<AddressItem | null>(null)
 const searchModel = ref<string | undefined>(undefined)
 const items = ref<AddressItem[] | undefined>([])
+const status = ref(true)
+const units = ['кг', 'шт']
+const {handleError} = useHandleError()
+const {translate} = useAppI18n()
+const request = requestService()
+const loadingPosts = ref<boolean>(false)
+const posts = ref<AddPostBody[]>([])
+const isSubmitting = ref<boolean>(false)
 
 const EditSheet = ref(false)
 const userFarms = farms.value?.items.filter(farm=>farm.user.id===currentUser.value?.id)
@@ -311,15 +340,18 @@ const updateNameImageNow = (imageName: string) => {
 
 const saveData = () => {
   localStorage.setItem('name', name.value)
-
-
-
   localStorage.setItem('adress', addressModel?.value?.address ? addressModel?.value?.address: "Error")
-
 }
 
-
-
+const changeFarmFun = async (farmId: number) => {
+   try {
+      const response = request.getFarmById(farmId).then(res => {
+         farmStore.nowFarm = res
+      })
+   } catch (e) {
+      console.log(e)
+   }
+}
 const imageServerToBase64 = () => {
    setTimeout(() => {
       const imagePath = `https://horodyna.grassbusinesslabs.tk/static/${offersStore.nameImageNow}`;
@@ -337,13 +369,7 @@ const imageServerToBase64 = () => {
             console.error('Помилка завантаження зображення:', error);
          });
    }, 50)
-
-
 }
-
-
-
-
 
 const debounceSearch = debounce(search, 1000)
 const emit = defineEmits<{
@@ -411,13 +437,16 @@ const promise = new Promise((resolve) => {
    resolve(userFarms)
 })
 async function getMyFarm() {
-   const result = await promise
-   y = result
-   console.log(result)
-   return y
-
+   const res = await request.getFarms()
+   const farms = res.items
+   farmStore.farms = farms.filter(farm => farm.user.id === userStore.currentUser.id && farmStore.farmsId.push({address: farm.address, id: farm.id}))
+   if (farmStore.farms !== null) {
+      farmStore.nowFarm = farmStore.farms[0]
+   }
 }
 getMyFarm()
+
+
 setTimeout(() => {
    for(let i of y){
       console.log(i.id)
@@ -446,7 +475,7 @@ let bodyOffer:createOffer = reactive({
 async function addOffer(){
 
    const body : createOffer = {
-      farm_id: bodyOffer.farm_id,
+      farm_id:farmStore.nowFarm.id,
       title: bodyOffer.title,
       description: bodyOffer.description,
       image: {
@@ -525,14 +554,7 @@ async function getOffer(){
 
 onMounted(() => {getOffer()})
 
-const status = ref(true)
-const units = ['кг', 'шт']
-const {handleError} = useHandleError()
-const {translate} = useAppI18n()
-const request = requestService()
-const loadingPosts = ref<boolean>(false)
-const posts = ref<AddPostBody[]>([])
-const isSubmitting = ref<boolean>(false)
+
 
 const addPostLocal = () => {
    const body: AddPostBody = {

@@ -8,14 +8,15 @@ import { useHandleError } from '@/composables';
 
 export const useFarmStore = defineStore('farm', () => {
    const { handleError } = useHandleError();
-   const request = requestService();
+   const request = requestService()
 
-   // Check localStorage for existing data
+
+
    const storedFarms = localStorage.getItem('farms');
    const initialFarms = storedFarms ? JSON.parse(storedFarms) : null;
-
    const farms: Ref<farmResponce | null> = ref<farmResponce | null>(initialFarms);
-
+   const nowFarm: Ref<farmResponce | null> = ref<farmResponce | null>(null);
+   const farmsId = ref([])
    function setFarms(value: farmResponce | null): void {
       farms.value = value;
       // Update localStorage whenever farms are changed
@@ -46,6 +47,8 @@ export const useFarmStore = defineStore('farm', () => {
    return {
       farms,
       setFarms,
+      nowFarm,
       populateFarms,
+      farmsId
    };
 });

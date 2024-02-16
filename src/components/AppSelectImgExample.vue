@@ -20,7 +20,7 @@
          alt='Cropped image'
       >
 
-      <img class='cropped-img' :src='linkIMG+OfferStore.nowOffer.image' v-else>
+      <img class='cropped-img' :src='linkIMG+OfferStore.nowOffer.image' v-if='OfferStore.nowOffer.image'>
 
    </v-col>
 
