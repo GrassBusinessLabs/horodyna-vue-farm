@@ -5,7 +5,8 @@ interface State {
    nowOffer: changeOffer[],
    croppedImage: any,
    nowImageBase64: string | null,
-   nameImageNow: string | null
+   nameImageNow: string | null,
+   nowFarmOffers: any [] | null
 }
 export const useOffersStore = defineStore({id: 'offers',
    state: (): State => ({
@@ -13,7 +14,8 @@ export const useOffersStore = defineStore({id: 'offers',
       nowOffer: [],
       croppedImage: null,
       nowImageBase64: null,
-      nameImageNow: null
+      nameImageNow: null,
+      nowFarmOffers: []
    })
 
 

@@ -1,6 +1,6 @@
 <template>
    <v-btn @click="sheet =!sheet" class="custom-btn w-100 mb-2nmp">Додати ферму</v-btn>
-   <v-card class="ma-5 ramka " v-for="farm in getMyFarm()" :key="farm.id">
+   <v-card v-if="getMyFarm() !== undefined" class="ma-5 ramka " v-for="farm in getMyFarm()" :key="farm.id" @click='getOrdersByFarmId(farm)'>
 
      <div class="ma-5">
 
@@ -54,6 +54,7 @@ import {requestService} from '@/services'
 import {useFarmStore} from '@/stores/farm-store.ts'
 import {storeToRefs} from 'pinia'
 import {useUserStore} from '@/stores'
+import router from '@/router'
 
 const userStore = useUserStore()
 const {populate} = userStore
@@ -145,6 +146,12 @@ async function search(value: string | null): Promise<void> {
       items.value = []
       loading.value = false
    }
+}
+
+const getOrdersByFarmId = (farm: object) => {
+   farmStore.nowFarm = farm
+   router.replace(`/posts`)
+   console.log(farm)
 }
 
 </script>

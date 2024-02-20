@@ -129,10 +129,7 @@ async function convertToBase64(file: File): Promise<string> {
 
 <style lang='scss'>
 .image-container {
-   max-width: 450px;
-   max-height: 300px;
    overflow: hidden;
-
    & img {
       width: 100%;
    }

@@ -1,5 +1,5 @@
 <template>
-   <v-app-bar color='primary'>
+   <v-app-bar >
       <v-btn icon @click="toggleSidebar" v-if="route.path !== '/sign-in' && route.path !== '/add-address' &&route.path !== '/register'" >
         <v-icon>mdi-menu</v-icon>
       </v-btn>
@@ -14,44 +14,48 @@
    <v-navigation-drawer v-model="sidebarOpen" app >
 
       <v-list-item
-         prepend-avatar='https://randomuser.me/api/portraits/men/78.jpg'
-         class='my-padding'
+         class='my-padding pl-4 pb-2'
       >
-        <v-list-item-title class='my-subtitle app-font-regular'>{{ currentUser?.name }}</v-list-item-title>
-        <v-list-item-subtitle class='my-font-size'>{{ currentUser?.email }}</v-list-item-subtitle>
-        <template v-slot:append>
-        </template>
+         <v-list-item-title class='my-subtitle app-font-regular'>{{ currentUser?.name }}</v-list-item-title>
+         <v-list-item-subtitle class='my-font-size pb-1'>{{ currentUser?.email }}</v-list-item-subtitle>
+         <template v-slot:append>
+            <v-icon size='27' icon="mdi-chevron-left" @click='sidebarOpen = false'></v-icon>
+         </template>
       </v-list-item>
      <v-divider thickness='2'></v-divider>
-      <v-card class='mx-auto' rounded='lg'>
-
+      <v-card class='mx-auto' elevation='0' rounded='lg'>
          <v-card-text>
-
-           <v-btn class='mt-2' :block='true' type='button' variant='text' @click='goToMain'>
-
-             {{ translate('BTNS.MAINPAGE') }}
-           </v-btn>
-
-           <v-btn class='mt-2' :block='true' type='button' variant='text' @click='addAdress'>
-
-             {{ translate('BTNS.ADD') }}
-           </v-btn>
-
-            <v-btn class='mt-2' :block='true' type='button' variant='text' @click='addAddress()'>
-               {{ translate('BTNS.ADD_ADDRESS') }}
-            </v-btn>
-
-            <v-btn class='mt-2' :block='true' type='button' variant='text' @click='goToProfile'>
-               {{ translate('BTNS.SETTINGS') }}
-            </v-btn>
-
-            <v-btn class='mt-2' :block='true' type='button' variant='text' @click='aboutUs'>
-               {{ translate('BTNS.ABOUT') }}
-            </v-btn>
-
-            <v-btn class='mt-2' :block='true' type='button' variant='text' @click='logout'>
-               {{ translate('BTNS.LOGOUT') }}
-            </v-btn>
+            <v-list >
+               <v-list-item-subtitle class='my-font-size ml-2 mb-2 mt-1'>
+                  ОГЛЯД
+               </v-list-item-subtitle>
+               <v-list-item
+                  class='pl-0 pt-0 mb-0'
+                  v-for='i of listMenuReview'
+                  :key="i.name"
+                  @click='i.routing'
+               >
+                  <template v-slot:prepend >
+                     <v-icon size='27' icon="mdi-chevron-right"></v-icon>
+                     <v-icon class='mx-1'>{{i.icon}}</v-icon>
+                     <p class='my-font-size ml-2'>{{i.name}}</p>
+                  </template>
+               </v-list-item>
+               <v-list-item-subtitle class='my-font-size ml-2 mb-2 mt-1'>
+                  АККАУНТ
+               </v-list-item-subtitle>
+               <v-list-item
+                  class='pl-0 pt-0 mb-0'
+                  v-for='j of listMenuAccount'
+                  @click='j.routing'
+               >
+                  <template v-slot:prepend>
+                     <v-icon size='27' icon="mdi-chevron-right"></v-icon>
+                     <v-icon class='mx-1'>{{j.icon}}</v-icon>
+                     <p class='my-font-size ml-2'>{{j.name}}</p>
+                  </template>
+               </v-list-item>
+            </v-list>
             
          </v-card-text>
       </v-card>
@@ -73,11 +77,19 @@ const { translate } = useAppI18n()
 const userStore = useUserStore()
 const { logout } = userStore
 const { currentUser } = storeToRefs(userStore)
-const addAddress = () => {
-   router.replace("/settings")
-}
+
 const sidebarOpen = ref(false)
 const route = useRoute()
+
+const listMenuReview = [
+   {icon: 'mdi-home-outline', name: translate('BTNS.MAINPAGE'), routing: goToMain},
+   {icon: 'mdi-home-silo-outline', name: translate('BTNS.ADD'), routing: addAdress},
+   {icon: 'mdi-help-circle-outline', name: translate('BTNS.SETTINGS'), routing: goToProfile}
+]
+const listMenuAccount = [
+   {icon: 'mdi-cog-outline', name: translate('BTNS.ADD_ADDRESS'), routing: addAddress},
+   {icon: 'mdi-logout', name: translate('BTNS.LOGOUT'), routing: logout},
+]
 
 function toggleSidebar() {
    sidebarOpen.value = !sidebarOpen.value
@@ -86,7 +98,9 @@ function toggleSidebar() {
 function goBack() {
    router.replace("/posts")
 }
-
+function addAddress () {
+   router.replace("/settings")
+}
 // New function to navigate to the profile page
 function goToProfile() {
    router.replace("/profile")
@@ -105,6 +119,10 @@ function addAdress() {
 </script>
 
 <style lang='scss' scoped>
+.v-app-bar{
+   background-color: #6168DB;
+   color: #fff;
+}
 .card-title {
    font-size: 1rem;
 }
@@ -126,4 +144,5 @@ function addAdress() {
 .my-padding {
   padding: 11.6px;
 }
+
 </style>

@@ -57,6 +57,9 @@ export const requestService = () => {
    async function getOffers() {
       return api.get('/offers')
    }
+   async function getOffersByFarmId(id: number) {
+      return api.get(`/offers/by-farmid/${id}`)
+   }
    async function getFarmById(id: number) {
       return api.get(`/farms/${id}`)
    }
@@ -73,6 +76,7 @@ export const requestService = () => {
       return api.del(`/offers/${id}`)
    }
    return {
+      getOffersByFarmId,
       changePassword,
       login,
       register,

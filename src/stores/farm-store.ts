@@ -17,6 +17,7 @@ export const useFarmStore = defineStore('farm', () => {
    const farms: Ref<farmResponce | null> = ref<farmResponce | null>(initialFarms);
    const nowFarm: Ref<farmResponce | null> = ref<farmResponce | null>(null);
    const farmsId = ref([])
+   const farmsAddress = ref([])
    function setFarms(value: farmResponce | null): void {
       farms.value = value;
       // Update localStorage whenever farms are changed
@@ -49,6 +50,7 @@ export const useFarmStore = defineStore('farm', () => {
       setFarms,
       nowFarm,
       populateFarms,
-      farmsId
+      farmsId,
+      farmsAddress
    };
 });
