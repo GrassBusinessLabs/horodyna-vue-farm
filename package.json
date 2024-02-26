@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/android": "5.7.0",
+    "@capacitor/core": "^5.7.0",
     "@ionic/vue": "^7.7.2",
     "@ionic/vue-router": "^7.7.2",
     "@tomtom-international/web-sdk-maps": "^6.25.0",
@@ -28,6 +30,7 @@
     "vuetify": "^3.4.4"
   },
   "devDependencies": {
+    "@capacitor/cli": "^5.7.0",
     "@mdi/font": "^7.3.67",
     "@types/lodash.debounce": "^4.0.9",
     "@types/node": "^20.10.3",

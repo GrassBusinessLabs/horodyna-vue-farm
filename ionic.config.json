@@ -1,0 +1,7 @@
+{
+  "name": "horodyna-farm",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}

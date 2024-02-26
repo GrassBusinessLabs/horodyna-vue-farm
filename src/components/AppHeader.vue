@@ -84,6 +84,7 @@ const route = useRoute()
 const listMenuReview = [
    {icon: 'mdi-home-outline', name: translate('BTNS.MAINPAGE'), routing: goToMain},
    {icon: 'mdi-home-silo-outline', name: translate('BTNS.ADD'), routing: addAdress},
+   {icon: 'mdi-basket-outline', name: translate('BTNS.ORDERS'), routing: goToOrders},
    {icon: 'mdi-help-circle-outline', name: translate('BTNS.SETTINGS'), routing: goToProfile}
 ]
 const listMenuAccount = [
@@ -106,6 +107,9 @@ function goToProfile() {
    router.replace("/profile")
 }
 
+function goToOrders() {
+   router.replace("/orders")
+}
 function goToMain() {
    router.replace("/posts")
 }

@@ -75,7 +75,21 @@ export const requestService = () => {
    async function deleteOffer(id: any){
       return api.del(`/offers/${id}`)
    }
+   async function getOrdersByFarmer(){
+      return api.get(`/orders/by-farmer`)
+   }
+
+   async function getAddressById(id: number) {
+      return api.get(`/address/${id}`)
+   }
+
+   async function getOrderById(id: number) {
+      return api.get(`/orders/${id}`)
+   }
    return {
+      getAddressById,
+      getOrderById,
+      getOrdersByFarmer,
       getOffersByFarmId,
       changePassword,
       login,
