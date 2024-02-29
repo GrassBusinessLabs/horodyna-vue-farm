@@ -11,6 +11,7 @@
   "dependencies": {
     "@capacitor/android": "5.7.0",
     "@capacitor/core": "^5.7.0",
+    "@capacitor/ios": "5.7.0",
     "@ionic/vue": "^7.7.2",
     "@ionic/vue-router": "^7.7.2",
     "@tomtom-international/web-sdk-maps": "^6.25.0",
