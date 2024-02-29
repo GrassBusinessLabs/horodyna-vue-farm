@@ -40,8 +40,7 @@ const getOrderById = async (id: number) => {
      const res = await request.getOrderById(id)
      orderStore.nowOrder = res
      for (const i of res.order_items){
-        getOfferById(i.offer_id)
-        console.log(i.offer_id)
+        await getOfferById(i.offer_id)
      }
 
   } catch (e) {
@@ -85,7 +84,7 @@ const formatDate = (dateString: any) => {
       <span class='marker-title'>Очікують підтвердження</span>
       <v-card class='order' v-for='i of orderStore.orders'>
 
-         <div class='container' @click='infoByOrder(i.id), getAddress(i.address_id)' v-if='i.status === "DRAFT"'>
+         <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "SUBMITTED"'>
             <v-avatar class='w-25 h-25' image='https://cdn-icons-png.flaticon.com/512/1027/1027650.png'></v-avatar>
 
 
@@ -100,24 +99,27 @@ const formatDate = (dateString: any) => {
 
       </v-card>
 
-      <span class='marker-title'>Підтверджені</span>
+      <div>
+         <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "SHIPPING")'>Підтверджені</span>
 
-      <v-card class='order' v-for='i of orderStore.orders' >
+         <v-card class='order' v-for='i of orderStore.orders' >
 
-         <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "SUBMITTED"'>
+            <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "SHIPPING"'>
                <v-avatar class='w-25 h-25' image='https://cdn-icons-png.flaticon.com/512/1584/1584365.png'></v-avatar>
 
 
-            <div class='ml-2'>
-               <p><v-icon>mdi-currency-uah</v-icon> {{i.product_price}} грн</p>
-               <p><v-icon>mdi-truck-delivery-outline</v-icon> {{i.shipping_price}} грн</p>
-               <p>До сплати {{i.total_price}} грн</p>
-               <p>{{formatDate( i.created_data)}}</p>
+               <div class='ml-2'>
+                  <p><v-icon>mdi-currency-uah</v-icon> {{i.product_price}} грн</p>
+                  <p><v-icon>mdi-truck-delivery-outline</v-icon> {{i.shipping_price}} грн</p>
+                  <p>До сплати {{i.total_price}} грн</p>
+                  <p>{{formatDate( i.created_data)}}</p>
+               </div>
+
             </div>
 
-         </div>
+         </v-card>
+      </div>
 
-      </v-card>
 
       <span class='marker-title'>Виконаний</span>
 
@@ -154,9 +156,9 @@ const formatDate = (dateString: any) => {
          <v-card-text>
             <div>
 
-               <div v-for='i of orderStore.allAddress' class='info-user'>
-                  <p class='username'>{{i.user.name}}</p>
-                  <p>{{i.city}}, {{i.address}}</p>
+               <div  class='info-user'>
+<!--                  <p class='username'>{{i.user.name}}</p>-->
+                  <p>{{orderStore.nowOrder.address}}</p>
                </div>
 
 
@@ -177,11 +179,20 @@ const formatDate = (dateString: any) => {
                            <p v-if='i.offer_id === j.id'>{{i.amount}}{{j.unit}} x {{i.price}}грн</p>
                         </div>
                      </div>
+
+
                   </div>
+
                </div>
 
             </div>
          </v-card-text>
+
+         <v-card-actions>
+            <div class='w-100'>
+               <v-btn class='change-status' :block='true'>Змінити статус замовлення</v-btn>
+            </div>
+         </v-card-actions>
 
       </v-card>
    </v-bottom-sheet>
@@ -207,7 +218,7 @@ const formatDate = (dateString: any) => {
    width: 512px;
 }
 .offer{
-   border: 2px ridge #6168DB;
+   background: #eeeeee;
    border-radius: 20px;
    margin: 10px;
    padding: 10px;
@@ -226,5 +237,9 @@ const formatDate = (dateString: any) => {
 .marker-title{
    color: #6168DB;
 
+}
+.change-status{
+   background: #6168DB;
+   color: #fff;
 }
 </style>

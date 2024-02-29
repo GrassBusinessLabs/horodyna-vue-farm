@@ -1,6 +1,5 @@
 <template>
    <home-layout>
-      <h1 class="centered-text">Моя ферма</h1>
       <app-map-example />
    </home-layout>
 

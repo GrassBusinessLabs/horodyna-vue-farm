@@ -33,6 +33,18 @@ export  interface createFarms{
    latitude: number
    longitude: number
 }
+
+export interface changeFarm {
+   name: string
+   city: string
+   address: string
+   latitude: number
+   longitude: number
+}
+
+{
+
+}
 export  interface farmResponce{
    items:[{
       id: number

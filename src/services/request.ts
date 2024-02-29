@@ -8,7 +8,7 @@ import type {
    changeOffer,
    RegisterBody,
    createFarms,
-   farmResponce, ChangePassword
+   farmResponce, ChangePassword, changeFarm
 } from '@/models'
 
 export const requestService = () => {
@@ -86,7 +86,23 @@ export const requestService = () => {
    async function getOrderById(id: number) {
       return api.get(`/orders/${id}`)
    }
+   async function addAdditionalImage(id: number, body: any) {
+      return api.post(`/offers/additional-image/${id}`, body)
+   }
+   async function deleteAdditionalImage(idOffer: number, idImage: number) {
+      return api.del(`/offers/additional-image/${idOffer}/${idImage}`)
+   }
+   async function deleteFarm(farmId: number) {
+      return api.del(`/farms/${farmId}`)
+   }
+   async function changeFarm(farmId: number, body: changeFarm) {
+      return api.put(`/farms/${farmId}`, body)
+   }
    return {
+      changeFarm,
+      deleteFarm,
+      deleteAdditionalImage,
+      addAdditionalImage,
       getAddressById,
       getOrderById,
       getOrdersByFarmer,

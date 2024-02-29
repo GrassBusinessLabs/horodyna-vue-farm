@@ -12,7 +12,7 @@
                <v-icon @click='changeFarm = !changeFarm' class='ma-2'>
                   mdi-map-marker-outline
                </v-icon>
-               <p v-if='farmStore.nowFarm'>{{ farmStore.nowFarm.address }}</p>
+               <p v-if='farmStore.nowFarm'>{{ farmStore.nowFarm.address.split(',')[0] }}, {{ farmStore.nowFarm.address.split(',')[1] }}, {{ farmStore.nowFarm.city }}</p>
             </div>
 
 

@@ -11,7 +11,7 @@ export const useFarmStore = defineStore('farm', () => {
    const request = requestService()
 
 
-
+   const nowFarmId: Ref<number> = ref(0)
    const storedFarms = localStorage.getItem('farms');
    const initialFarms = storedFarms ? JSON.parse(storedFarms) : null;
    const farms: Ref<farmResponce | null> = ref<farmResponce | null>(initialFarms);
@@ -51,6 +51,7 @@ export const useFarmStore = defineStore('farm', () => {
       nowFarm,
       populateFarms,
       farmsId,
-      farmsAddress
+      farmsAddress,
+      nowFarmId
    };
 });

@@ -27,7 +27,7 @@ export const apiService = () => {
       // let token = localStorage.getItem('token')
 
       if (token) {
-         console.log(token)
+         // console.log(token)
          // config.headers!['Authorization'] = `Bearer ${token}`
          config.headers.Authorization = `Bearer ${token}`;
       }
