@@ -1,10 +1,10 @@
 <template>
    <v-app-bar >
-      <v-btn icon @click="toggleSidebar" v-if="route.path !== '/sign-in' && route.path !== '/add-address' &&route.path !== '/register'" >
+      <v-btn icon @click="toggleSidebar" v-if="route.path !== '/sign-in' && route.path !== '/add-address' &&route.path !== '/register' && route.path !== '/pay' && route.path !== '/transactions' " >
         <v-icon>mdi-menu</v-icon>
       </v-btn>
 
-      <v-btn icon @click="goBack" v-if="route.path === '/add-address'">
+      <v-btn icon @click="goBack" v-if="route.path === '/add-address' || route.path === '/pay' || route.path === '/transactions'">
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
 
@@ -85,6 +85,7 @@ const listMenuReview = [
    {icon: 'mdi-home-outline', name: translate('BTNS.MAINPAGE'), routing: goToMain},
    {icon: 'mdi-home-silo-outline', name: translate('BTNS.ADD'), routing: addAdress},
    {icon: 'mdi-basket-outline', name: translate('BTNS.ORDERS'), routing: goToOrders},
+   {icon: 'mdi-currency-uah', name: translate('BTNS.PAY'), routing: goToTransactions},
    {icon: 'mdi-help-circle-outline', name: translate('BTNS.SETTINGS'), routing: goToProfile}
 ]
 const listMenuAccount = [
@@ -109,6 +110,9 @@ function goToProfile() {
 
 function goToOrders() {
    router.replace("/orders")
+}
+function goToTransactions() {
+   router.replace("/transactions")
 }
 function goToMain() {
    router.replace("/posts")

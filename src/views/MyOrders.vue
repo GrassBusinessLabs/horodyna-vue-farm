@@ -48,7 +48,22 @@ const getOrderById = async (id: number) => {
   }
 }
 
+const changeStatusOrder = async (statusOrder: string) => {
+   try {
+      const res = await request.changeStatusOrder(55, orderStore.nowOrder.id, {status: statusOrder})
+      await getOrders()
+      infoOrder.value = false
+      console.log(res)
+   } catch (e) {
+      console.log(e)
+   }
+}
 
+const statuses = [
+   { title: 'Підтверджено', status: 'APPROVED'},
+   { title: 'Доставляється', status: 'SHIPPING'},
+   { title: 'Відхилено', status: 'DECLINED'},
+]
 
 const getAddress = async (id: number) => {
    orderStore.allAddress = []
@@ -81,7 +96,11 @@ const formatDate = (dateString: any) => {
 <home-layout>
 <v-row>
    <v-col >
-      <span class='marker-title'>Очікують підтвердження</span>
+      <span class='ma-4 pa-2 d-flex justify-center flex-column align-center' v-if='orderStore.orders.some(order => order.status !== "SUBMITTED") || orderStore.orders.some(order => order.status !== "SHIPPING") || orderStore.orders.some(order => order.status === "APPROVED") || orderStore.orders.some(order => order.status === "COMPLETED")'>
+         <img width='40%' src='https://cdn-icons-png.flaticon.com/512/5102/5102639.png' >
+         <p class='marker-title font-weight-bold mt-2'>Замовлень немає</p>
+      </span>
+      <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "SUBMITTED")'>Очікують підтвердження</span>
       <v-card class='order' v-for='i of orderStore.orders'>
 
          <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "SUBMITTED"'>
@@ -100,7 +119,7 @@ const formatDate = (dateString: any) => {
       </v-card>
 
       <div>
-         <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "SHIPPING")'>Підтверджені</span>
+         <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "SHIPPING")'>Доставляються</span>
 
          <v-card class='order' v-for='i of orderStore.orders' >
 
@@ -120,8 +139,26 @@ const formatDate = (dateString: any) => {
          </v-card>
       </div>
 
+      <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "APPROVED")'>Підверджені</span>
 
-      <span class='marker-title'>Виконаний</span>
+      <v-card class='order' v-for='i of orderStore.orders' >
+
+         <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "APPROVED"'>
+            <v-avatar class='w-25 h-25' image='https://cdn-icons-png.flaticon.com/512/1584/1584360.png'></v-avatar>
+
+
+            <div class='ml-2'>
+               <p><v-icon>mdi-currency-uah</v-icon> {{i.product_price}} грн</p>
+               <p><v-icon>mdi-truck-delivery-outline</v-icon> {{i.shipping_price}} грн</p>
+               <p>Сплачено {{i.total_price}} грн</p>
+               <p>{{formatDate( i.created_data)}}</p>
+            </div>
+
+         </div>
+      </v-card>
+
+
+      <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "COMPLETED")'>Виконаний</span>
 
       <v-card class='order' v-for='i of orderStore.orders' >
 
@@ -189,9 +226,29 @@ const formatDate = (dateString: any) => {
          </v-card-text>
 
          <v-card-actions>
-            <div class='w-100'>
-               <v-btn class='change-status' :block='true'>Змінити статус замовлення</v-btn>
-            </div>
+<!--            <div class='w-100'>-->
+<!--               <v-btn class='change-status' :block='true'>Змінити статус замовлення</v-btn>-->
+<!--            </div>-->
+            <v-menu>
+               <template v-slot:activator="{ props }">
+                  <v-btn
+                     class='w-100 change-status'
+                     v-bind="props"
+                  >
+                     Змінити статус замовлення
+                  </v-btn>
+               </template>
+               <v-list>
+                  <v-list-item
+                     @click='changeStatusOrder(item.status)'
+                     v-for="(item, index) in statuses"
+                     :key="index"
+                     :value="index"
+                  >
+                     <v-list-item-title>{{ item.title }}</v-list-item-title>
+                  </v-list-item>
+               </v-list>
+            </v-menu>
          </v-card-actions>
 
       </v-card>

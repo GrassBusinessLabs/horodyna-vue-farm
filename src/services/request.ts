@@ -98,7 +98,15 @@ export const requestService = () => {
    async function changeFarm(farmId: number, body: changeFarm) {
       return api.put(`/farms/${farmId}`, body)
    }
+   async function changeStatusOrder(farmID: number, orderID: number, body: {status: string}) {
+      return api.put(`/orders/farmer-status/${farmID}/${orderID}`, body)
+   }
+   async function getPercentage () {
+      return api.get(`orders/farmer-percentage`)
+   }
    return {
+      getPercentage,
+      changeStatusOrder,
       changeFarm,
       deleteFarm,
       deleteAdditionalImage,

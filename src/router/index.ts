@@ -13,6 +13,8 @@ import RegistrationView from '@/views/RegistrationView.vue'
 import Profile from '@/views/Profile.vue'
 import AboutPage from '@/views/AboutPage.vue'
 import MyOrders from '@/views/MyOrders.vue'
+import TransactionsOrders from '@/views/TransactionsOrders.vue'
+import AppPay from '@/components/AppPay.vue'
 
 const toastDialog = useToastDialog()
 const authToken = authTokenService()
@@ -65,6 +67,16 @@ const routes: RouteRecordRaw[] = [
       path: '/orders',
       name: 'Orders',
       component: MyOrders
+   },
+   {
+      path: '/transactions',
+      name: 'Transactions',
+      component: TransactionsOrders
+   },
+   {
+      path: '/pay',
+      name: 'Pay',
+      component: AppPay
    }
 
 ] as RouteRecordRaw[]
