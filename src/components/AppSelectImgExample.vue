@@ -39,7 +39,7 @@
 <!--         <img class='cropped-img' :src='linkIMG+OfferStore.nowOffer.image' v-if='OfferStore.nowOffer.image'>-->
 <!--         <img class='additional-image-img' v-for='i of OfferStore.nowOffer.additional_images'  :src='linkIMG+i.name' alt='' >-->
 
-         <v-carousel :show-arrows="false">
+         <v-carousel :show-arrows="false" v-if='OfferStore.nowOffer.image'>
             <v-carousel-item v-slot:default
                :src='linkIMG+OfferStore.nowOffer.image'
                cover

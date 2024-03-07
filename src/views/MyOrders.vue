@@ -3,31 +3,35 @@
 import HomeLayout from '@/layouts/HomeLayout.vue'
 import {requestService} from '@/services'
 import {useOrderStore} from '@/stores/order-store.ts'
-import {ref} from 'vue'
+import {computed, ref} from 'vue'
 
 const imgURL = 'https://horodyna.grassbusinesslabs.tk/static/'
 const infoOrder = ref(false)
 const orderStore = useOrderStore()
 const request = requestService()
 const getOrders = async () => {
-  try {
-     const res = await request.getOrdersByFarmer()
-     orderStore.orders = res.items
-  } catch (e) {
-     console.log(e)
-  }
+   try {
+      const res = await request.getOrdersByFarmer()
+      orderStore.orders = res.items
+   } catch (e) {
+      console.log(e)
+   }
 }
 getOrders()
 
 const getOfferById = async (id: number) => {
-  try {
-     const res = await request.getOfferById(id)
-     orderStore.offersInfo.push(res)
-     console.log(res)
-  } catch (e) {
-     console.log(e)
-  }
+   try {
+      const res = await request.getOfferById(id)
+      orderStore.offersInfo.push(res)
+      console.log(res.image)
+      return res.image
+   } catch (e) {
+      console.log(e)
+   }
 }
+
+
+
 
 
 const infoByOrder = async (id: number) => {
@@ -36,21 +40,21 @@ const infoByOrder = async (id: number) => {
 }
 const getOrderById = async (id: number) => {
    orderStore.offersInfo = []
-  try {
-     const res = await request.getOrderById(id)
-     orderStore.nowOrder = res
-     for (const i of res.order_items){
-        await getOfferById(i.offer_id)
-     }
+   try {
+      const res = await request.getOrderById(id)
+      orderStore.nowOrder = res
+      for (const i of res.order_items) {
+         await getOfferById(i.offer_id)
+      }
 
-  } catch (e) {
-     console.log(e)
-  }
+   } catch (e) {
+      console.log(e)
+   }
 }
 
 const changeStatusOrder = async (statusOrder: string) => {
    try {
-      const res = await request.changeStatusOrder(55, orderStore.nowOrder.id, {status: statusOrder})
+      const res = await request.changeStatusOrder(orderStore.offersInfo[0].farm_id, orderStore.nowOrder.id, {status: statusOrder})
       await getOrders()
       infoOrder.value = false
       console.log(res)
@@ -59,11 +63,14 @@ const changeStatusOrder = async (statusOrder: string) => {
    }
 }
 
-const statuses = [
-   { title: 'Підтверджено', status: 'APPROVED'},
-   { title: 'Доставляється', status: 'SHIPPING'},
-   { title: 'Відхилено', status: 'DECLINED'},
+const statusesApproveAndDecline = [
+   {title: 'Підтверджено', status: 'APPROVED'},
+   {title: 'Відхилено', status: 'DECLINED'},
+
 ]
+
+const statusesShipping = [{title: 'Доставляється', status: 'SHIPPING'}, {title: 'Відхилено', status: 'DECLINED'}]
+const statusesForShipping = [{title: 'Виконано', status: 'COMPLETED'}]
 
 const getAddress = async (id: number) => {
    orderStore.allAddress = []
@@ -81,188 +88,353 @@ const formatDate = (dateString: any) => {
    const options = {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric',
-   };
+      year: 'numeric'
+   }
 
-   const formattedDate = new Date(dateString).toLocaleString('ua-UA', options);
-   return formattedDate;
-};
+   const formattedDate = new Date(dateString).toLocaleString('ua-UA', options)
+   return formattedDate
+}
+
+const statusToString = computed(() => (status: string) => {
+   if (status === 'APPROVED') {
+      return 'Підтверджено';
+   }
+   if (status === 'DECLINED') {
+      return 'Відхилено';
+   }
+   if (status === 'SHIPPING') {
+      return 'Доставляється'
+   }
+   if (status === 'COMPLETED') {
+      return 'Виконано'
+   }
+   if (status === 'SUBMITTED'){
+      return 'Очікує підвердження'
+   }
+});
+
+
 
 
 </script>
 
 
 <template>
-<home-layout>
-<v-row>
-   <v-col >
-      <span class='ma-4 pa-2 d-flex justify-center flex-column align-center' v-if='orderStore.orders.some(order => order.status !== "SUBMITTED") || orderStore.orders.some(order => order.status !== "SHIPPING") || orderStore.orders.some(order => order.status === "APPROVED") || orderStore.orders.some(order => order.status === "COMPLETED")'>
-         <img width='40%' src='https://cdn-icons-png.flaticon.com/512/5102/5102639.png' >
+   <home-layout>
+
+      <v-row>
+         <v-col>
+            <div>
+          <span class='ma-4 pa-2 d-flex justify-center flex-column align-center'
+                v-if='orderStore.orders.length < 1 || orderStore.orders.every(order => order.status === "DRAFT")'>
+         <img width='40%' src='https://cdn-icons-png.flaticon.com/512/5102/5102639.png'>
          <p class='marker-title font-weight-bold mt-2'>Замовлень немає</p>
       </span>
-      <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "SUBMITTED")'>Очікують підтвердження</span>
-      <v-card class='order' v-for='i of orderStore.orders'>
-
-         <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "SUBMITTED"'>
-            <v-avatar class='w-25 h-25' image='https://cdn-icons-png.flaticon.com/512/1027/1027650.png'></v-avatar>
-
-
-            <div class='ml-2'>
-               <p><v-icon>mdi-currency-uah</v-icon> {{i.product_price}} грн</p>
-               <p><v-icon>mdi-truck-delivery-outline</v-icon> {{i.shipping_price}} грн</p>
-               <p>До сплати {{i.total_price}} грн</p>
-               <p>{{formatDate( i.created_data)}}</p>
             </div>
 
-         </div>
 
-      </v-card>
+            <div class='order-block' v-if='orderStore.orders.some(order => order.status === "SUBMITTED")'>
+               <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "SUBMITTED")'>Очікують підтвердження</span>
+               <v-card class='order' v-for='i of orderStore.orders' >
 
-      <div>
-         <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "SHIPPING")'>Доставляються</span>
+                  <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "SUBMITTED"'>
 
-         <v-card class='order' v-for='i of orderStore.orders' >
+                     <div class='w-25 position-relative'>
+                        <v-avatar class='w-100 h-100 ' image='https://cdn-icons-png.flaticon.com/512/1027/1027650.png'>
 
-            <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "SHIPPING"'>
-               <v-avatar class='w-25 h-25' image='https://cdn-icons-png.flaticon.com/512/1584/1584365.png'></v-avatar>
-
-
-               <div class='ml-2'>
-                  <p><v-icon>mdi-currency-uah</v-icon> {{i.product_price}} грн</p>
-                  <p><v-icon>mdi-truck-delivery-outline</v-icon> {{i.shipping_price}} грн</p>
-                  <p>До сплати {{i.total_price}} грн</p>
-                  <p>{{formatDate( i.created_data)}}</p>
-               </div>
-
-            </div>
-
-         </v-card>
-      </div>
-
-      <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "APPROVED")'>Підверджені</span>
-
-      <v-card class='order' v-for='i of orderStore.orders' >
-
-         <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "APPROVED"'>
-            <v-avatar class='w-25 h-25' image='https://cdn-icons-png.flaticon.com/512/1584/1584360.png'></v-avatar>
-
-
-            <div class='ml-2'>
-               <p><v-icon>mdi-currency-uah</v-icon> {{i.product_price}} грн</p>
-               <p><v-icon>mdi-truck-delivery-outline</v-icon> {{i.shipping_price}} грн</p>
-               <p>Сплачено {{i.total_price}} грн</p>
-               <p>{{formatDate( i.created_data)}}</p>
-            </div>
-
-         </div>
-      </v-card>
-
-
-      <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "COMPLETED")'>Виконаний</span>
-
-      <v-card class='order' v-for='i of orderStore.orders' >
-
-         <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "COMPLETED"'>
-            <v-avatar class='w-25 h-25' image='https://cdn-icons-png.flaticon.com/512/1584/1584360.png'></v-avatar>
-
-
-            <div class='ml-2'>
-               <p><v-icon>mdi-currency-uah</v-icon> {{i.product_price}} грн</p>
-               <p><v-icon>mdi-truck-delivery-outline</v-icon> {{i.shipping_price}} грн</p>
-               <p>Сплачено {{i.total_price}} грн</p>
-               <p>{{formatDate( i.created_data)}}</p>
-            </div>
-
-         </div>
-      </v-card>
-   </v-col>
-</v-row>
-
-   <v-bottom-sheet v-model='infoOrder'>
-      <v-card height='700' class='bottom-card' >
-         <v-card-title class='text-center'>
-            Деталі замовлення #{{ orderStore.nowOrder.id }}
-            <v-list-item-subtitle class='my-subtitle py-1'>
-               Продукти: {{ orderStore.nowOrder.product_price }} грн
-            </v-list-item-subtitle>
-            <v-list-item-subtitle class='my-subtitle pt-2 pb-1'>
-               Доставка: {{  orderStore.nowOrder.shipping_price}} грн
-            </v-list-item-subtitle>
-            Сума: {{  orderStore.nowOrder.total_price }} грн
-         </v-card-title>
-         <v-card-text>
-            <div>
-
-               <div  class='info-user'>
-<!--                  <p class='username'>{{i.user.name}}</p>-->
-                  <p>{{orderStore.nowOrder.address}}</p>
-               </div>
-
-
-
-               <div v-for='j of orderStore.offersInfo' class='d-flex justify-space-between offer'>
-                  <div>
-                     <v-avatar size='80' :image='imgURL+j.image'>
-
-                     </v-avatar>
-                  </div>
-
-
-                  <div class='w-100 d-flex justify-center'>
-                     <div>
-                        <h3 class='title-order'>{{j.title}}</h3>
-                        <p>{{j.description}}</p>
-                        <div v-for='i of orderStore.nowOrder.order_items'>
-                           <p v-if='i.offer_id === j.id'>{{i.amount}}{{j.unit}} x {{i.price}}грн</p>
-                        </div>
+                        </v-avatar>
+                        <div class='counter_offers'>{{ i.order_items.length }}</div>
                      </div>
 
 
+                     <div class='ml-2'>
+                        <p>
+                           <v-icon>mdi-currency-uah</v-icon>
+                           {{ i.product_price }} грн
+                        </p>
+                        <p>
+                           <v-icon>mdi-truck-delivery-outline</v-icon>
+                           {{ i.shipping_price }} грн
+                        </p>
+                        <p>
+                           <v-icon>
+                              mdi-cash
+                           </v-icon>
+                           {{ i.total_price }} грн</p>
+                        <p>
+                           <v-icon>mdi-clock-time-ten-outline</v-icon>
+                           {{ formatDate(i.created_data) }}
+                        </p>
+                     </div>
+
+                  </div>
+
+               </v-card>
+            </div>
+
+
+            <div class='order-block' v-if='orderStore.orders.some(order => order.status === "SHIPPING")'>
+               <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "SHIPPING")'>Доставляються</span>
+               <v-card class='order' v-for='i of orderStore.orders'>
+
+                  <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "SHIPPING"'>
+                     <div class='w-25 position-relative'>
+                        <v-avatar class='w-100 h-100'
+                                  image='https://cdn-icons-png.flaticon.com/512/1584/1584365.png'></v-avatar>
+                        <div class='counter_offers'>{{ i.order_items.length }}</div>
+                     </div>
+
+                     <div class='ml-2'>
+
+                        <p>
+                           <v-icon>
+                              mdi-cash
+                           </v-icon>
+                           {{ i.total_price }} грн</p>
+                        <p>
+                           <v-icon>mdi-clock-time-ten-outline</v-icon>
+                           {{ formatDate(i.created_data) }}
+                        </p>
+                     </div>
+
+                  </div>
+
+               </v-card>
+            </div>
+
+            <div class='order-block' v-if='orderStore.orders.some(order => order.status === "APPROVED")'>
+               <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "APPROVED")'>Підверджені</span>
+
+               <v-card class='order' v-for='i of orderStore.orders'>
+
+                  <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "APPROVED"'>
+
+                     <div class='w-25 position-relative'>
+                        <v-avatar class='w-100 h-100'
+                                  image='https://cdn-icons-png.flaticon.com/512/1584/1584360.png'></v-avatar>
+                        <div class='counter_offers'>{{ i.order_items.length }}</div>
+                     </div>
+
+                     <div class='ml-2'>
+
+                        <p>
+                           <v-icon>
+                              mdi-cash
+                           </v-icon>
+                           {{ i.total_price }} грн</p>
+                        <p>
+                           <v-icon>mdi-clock-time-ten-outline</v-icon>
+                           {{ formatDate(i.created_data) }}
+                        </p>
+                     </div>
+
+                  </div>
+               </v-card>
+            </div>
+
+            <div class='order-block' v-if='orderStore.orders.some(order => order.status === "DECLINED")'>
+
+               <span class='marker-title'
+                     v-if='orderStore.orders.some(order => order.status === "DECLINED")'>Відхилені</span>
+
+               <v-card class='order' v-for='i of orderStore.orders'>
+
+                  <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "DECLINED"'>
+
+                     <div class='w-25 position-relative'>
+                        <v-avatar class='w-100 h-100'
+                                  image='https://cdn-icons-png.flaticon.com/512/4109/4109311.png'></v-avatar>
+                        <div class='counter_offers'>{{ i.order_items.length }}</div>
+                     </div>
+
+                     <div class='ml-2'>
+
+                        <p>
+                           <v-icon>
+                              mdi-cash
+                           </v-icon>
+                           {{ i.total_price }} грн</p>
+                        <p>
+                           {{ formatDate(i.created_data) }}
+                        </p>
+                     </div>
+
+                  </div>
+               </v-card>
+            </div>
+
+            <div class='order-block' v-if='orderStore.orders.some(order => order.status === "COMPLETED")'>
+
+               <span class='marker-title'
+                     v-if='orderStore.orders.some(order => order.status === "COMPLETED")'>Виконані</span>
+
+               <v-card class='order' v-for='i of orderStore.orders'>
+
+                  <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "COMPLETED"'>
+
+                     <div class='w-25 position-relative'>
+                        <v-avatar class='w-100 h-100'
+                                  image='https://w7.pngwing.com/pngs/871/200/png-transparent-check-mark-computer-icons-icon-design-complete-angle-logo-grass-thumbnail.png'></v-avatar>
+                        <div class='counter_offers'>{{ i.order_items.length }}</div>
+                     </div>
+
+                     <div class='ml-2'>
+
+
+                        <p>
+                           <v-icon>
+                              mdi-cash
+                           </v-icon>
+                           {{ i.total_price }} грн</p>
+                        <p>
+                           {{ formatDate(i.created_data) }}
+                        </p>
+                     </div>
+
+                  </div>
+               </v-card>
+            </div>
+
+
+         </v-col>
+      </v-row>
+
+      <v-bottom-sheet v-model='infoOrder'>
+         <v-card height='700' class='bottom-card'>
+            <v-card-title class='text-center'>
+               Деталі замовлення #{{ orderStore.nowOrder.id }}
+               <v-list-item-subtitle class='my-subtitle py-1'>
+                  Продукти: {{ orderStore.nowOrder.product_price }} грн
+               </v-list-item-subtitle>
+               <v-list-item-subtitle class='my-subtitle pt-2 pb-1'>
+                  Доставка: {{ orderStore.nowOrder.shipping_price }} грн
+               </v-list-item-subtitle>
+               Сума: {{ orderStore.nowOrder.total_price }} грн
+               <v-list-item-subtitle class='my-subtitle pt-2 pb-1'>
+                  {{ statusToString(orderStore.nowOrder.status) }}
+               </v-list-item-subtitle>
+            </v-card-title>
+            <v-card-text>
+               <div>
+
+                  <div class='info-user'>
+                     <div>
+
+                     </div>
+                     <p class='username' v-if='orderStore.nowOrder.user'>{{ orderStore.nowOrder.user.name }}</p>
+
+                     <p>{{ orderStore.nowOrder.address }}</p>
+                  </div>
+
+
+                  <div v-for='j of orderStore.offersInfo' class='d-flex justify-space-between offer'>
+                     <div>
+                        <v-avatar size='80' :image='imgURL+j.image'>
+
+                        </v-avatar>
+                     </div>
+
+
+                     <div class='w-100 d-flex justify-center'>
+                        <div>
+                           <h3 class='title-order'>{{ j.title }}</h3>
+                           <p>{{ j.description }}</p>
+                           <div v-for='i of orderStore.nowOrder.order_items'>
+                              <p v-if='i.offer_id === j.id'>{{ i.amount }}{{ j.unit }} x {{ i.price }}грн</p>
+                           </div>
+                        </div>
+
+
+                     </div>
+
                   </div>
 
                </div>
+            </v-card-text>
 
-            </div>
-         </v-card-text>
+            <v-card-actions>
+               <!--            <div class='w-100'>-->
+               <!--               <v-btn class='change-status' :block='true'>Змінити статус замовлення</v-btn>-->
+               <!--            </div>-->
+               <v-menu v-if='orderStore.nowOrder.status === "SUBMITTED"'>
+                  <template v-slot:activator='{ props }'>
+                     <v-btn
+                        class='w-100 change-status'
+                        v-bind='props'
+                     >
+                        Змінити статус замовлення
+                     </v-btn>
+                  </template>
+                  <v-list>
+                     <v-list-item
 
-         <v-card-actions>
-<!--            <div class='w-100'>-->
-<!--               <v-btn class='change-status' :block='true'>Змінити статус замовлення</v-btn>-->
-<!--            </div>-->
-            <v-menu>
-               <template v-slot:activator="{ props }">
-                  <v-btn
-                     class='w-100 change-status'
-                     v-bind="props"
-                  >
-                     Змінити статус замовлення
-                  </v-btn>
-               </template>
-               <v-list>
-                  <v-list-item
-                     @click='changeStatusOrder(item.status)'
-                     v-for="(item, index) in statuses"
-                     :key="index"
-                     :value="index"
-                  >
-                     <v-list-item-title>{{ item.title }}</v-list-item-title>
-                  </v-list-item>
-               </v-list>
-            </v-menu>
-         </v-card-actions>
+                        @click='changeStatusOrder(item.status)'
+                        v-for='(item, index) in statusesApproveAndDecline'
+                        :key='index'
+                        :value='index'
+                     >
+                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                     </v-list-item>
+                  </v-list>
+               </v-menu>
 
-      </v-card>
-   </v-bottom-sheet>
-</home-layout>
+               <v-menu v-if='orderStore.nowOrder.status === "APPROVED"'>
+                  <template v-slot:activator='{ props }'>
+                     <v-btn
+                        class='w-100 change-status'
+                        v-bind='props'
+                     >
+                        Змінити статус замовлення
+                     </v-btn>
+                  </template>
+                  <v-list>
+                     <v-list-item
+
+                        @click='changeStatusOrder(item.status)'
+                        v-for='(item, index) in statusesShipping'
+                        :key='index'
+                        :value='index'
+                     >
+                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                     </v-list-item>
+                  </v-list>
+               </v-menu>
+
+<!--               <v-menu v-if='orderStore.nowOrder.status === "SHIPPING"'>-->
+<!--                  <template v-slot:activator='{ props }'>-->
+<!--                     <v-btn-->
+<!--                        class='w-100 change-status'-->
+<!--                        v-bind='props'-->
+<!--                     >-->
+<!--                        Змінити статус замовлення-->
+<!--                     </v-btn>-->
+<!--                  </template>-->
+<!--                  <v-list>-->
+<!--                     <v-list-item-->
+
+<!--                        @click='changeStatusOrder(item.status)'-->
+<!--                        v-for='(item, index) in statusesForShipping'-->
+<!--                        :key='index'-->
+<!--                        :value='index'-->
+<!--                     >-->
+<!--                        <v-list-item-title>{{ item.title }}</v-list-item-title>-->
+<!--                     </v-list-item>-->
+<!--                  </v-list>-->
+<!--               </v-menu>-->
+            </v-card-actions>
+
+         </v-card>
+      </v-bottom-sheet>
+   </home-layout>
 </template>
 
 <style scoped lang='scss'>
-.order{
+.order {
    border-radius: 30px;
-   margin: 10px;
+   margin: 5px;
 }
 
-.container{
+.container {
    display: flex;
    margin: 10px;
    justify-content: space-around;
@@ -270,33 +442,57 @@ const formatDate = (dateString: any) => {
    padding: 10px;
 }
 
-.image{
+.image {
    height: 512px;
    width: 512px;
 }
-.offer{
+
+.offer {
    background: #eeeeee;
    border-radius: 20px;
    margin: 10px;
    padding: 10px;
 }
-.title-order{
+
+.title-order {
    color: #6168DB;
 }
-.info-user{
+
+.info-user {
    border-radius: 20px;
    margin: 10px;
    padding: 10px;
 }
-.username{
-   color: #6168DB;
-}
-.marker-title{
-   color: #6168DB;
 
+.username {
+   color: #6168DB;
 }
-.change-status{
+
+.marker-title {
+   color: #6168DB;
+}
+
+.change-status {
    background: #6168DB;
    color: #fff;
+}
+
+.counter_offers {
+   top: 0;
+   right: 0;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   position: absolute;
+   border-radius: 50%;
+   background: #6168DB;
+   width: 22px;
+   height: 22px;
+   color: #fff;
+   font-weight: 700;
+
+}
+.order-block{
+   margin: 10px;
 }
 </style>

@@ -167,13 +167,14 @@
                      <v-select
                         :items='farmStore.farmsId'
                         label='Ферма'
-                        item-title='id'
+                        item-title='address'
+                        item-value='id'
                         v-model='offersStore.nowOffer.farm_id'
                         variant='outlined'
 
                      >
                         <template v-slot:item='{props,  item }'>
-                           <v-list-item v-bind='props' :subtitle='item.raw.id' :title='item.raw.address'></v-list-item>
+                           <v-list-item v-bind='props' :title='item.raw.address'></v-list-item>
                         </template>
                      </v-select>
                   </v-col>
@@ -304,7 +305,7 @@
                            v-model='i.status'
                            hide-details
                            color='primary'
-                           @click='statusOffer = !statusOffer'
+                           @click='toggleStatus(i)'
                            :label='i.status ==true?"Є в наявності":"Немає в наявності"'
                         ></v-switch>
                      </v-col>
@@ -398,7 +399,7 @@ const userFarms = farms.value?.items.filter(farm => farm.user.id === currentUser
 let y: any = []
 let idfarms: any = []
 
-const updateNameImageNow = (imageName: string) => {
+const updateNameImageNow = async (imageName: string) => {
    offersStore.nameImageNow = imageName
 }
 
@@ -506,6 +507,17 @@ async function search(value: string | null): Promise<void> {
 function selectHandler(event: AddressItem): void {
    emit('select', event)
 
+}
+
+const toggleStatus = async (offer: object) => {
+   await updateNameImageNow(offer.image)
+   offersStore.nowOffer = offer
+   offersStore.croppedImage = null
+   imageServerToBase64()
+   setTimeout(async () => {
+      await changeOffer(offer.status)
+
+   }, 300)
 }
 
 const categories = ref<string[]>([
