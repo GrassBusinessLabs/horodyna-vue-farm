@@ -143,7 +143,7 @@
                         :block='true'
                         :disabled='isSubmitting || loadingPosts'
                         type='submit'
-                        color='primary'
+                        color='#6168DB'
                         @click='bottomSheetOpen = false, addOffer()'
                      >
                         {{ translate('BTNS.ADD_POST') }}
@@ -230,7 +230,7 @@
                         :block='true'
                         :disabled='isSubmitting || loadingPosts'
                         type='submit'
-                        color='primary'
+                        color='#6168DB'
                         @click='changeOffer()'
                      >
                         <!--                        {{ translate('BTNS.ADD_POST') }}-->
@@ -304,7 +304,7 @@
                         <v-switch
                            v-model='i.status'
                            hide-details
-                           color='primary'
+                           color='#6168DB'
                            @click='toggleStatus(i)'
                            :label='i.status ==true?"Є в наявності":"Немає в наявності"'
                         ></v-switch>
@@ -600,6 +600,7 @@ async function addOffer() {
    try {
       const response = await request.createOffer(body)
       await getOffer()
+      await getOffersByFarmId()
       console.log(response)
 
    } catch (e) {

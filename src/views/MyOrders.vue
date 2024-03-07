@@ -13,6 +13,12 @@ const getOrders = async () => {
    try {
       const res = await request.getOrdersByFarmer()
       orderStore.orders = res.items
+      orderStore.orders.forEach(order => {
+         order.order_items.forEach(offer => {
+            console.log(offer.offer_id)
+            getOfferById(offer.offer_id)
+         })
+      })
    } catch (e) {
       console.log(e)
    }
@@ -20,11 +26,23 @@ const getOrders = async () => {
 getOrders()
 
 const getOfferById = async (id: number) => {
+
    try {
       const res = await request.getOfferById(id)
       orderStore.offersInfo.push(res)
-      console.log(res.image)
+
+
       return res.image
+   } catch (e) {
+      console.log(e)
+   }
+}
+
+const getNowOfferById = async (id: number) => {
+   try {
+      const res = await request.getOfferById(id)
+      orderStore.infoOffersNowOrder.push(res)
+
    } catch (e) {
       console.log(e)
    }
@@ -33,10 +51,23 @@ const getOfferById = async (id: number) => {
 
 
 
-
 const infoByOrder = async (id: number) => {
+   orderStore.infoOffersNowOrder = []
    infoOrder.value = true
-   await getOrderById(id)
+   await getNowInfoOrdersById(id)
+}
+
+const getNowInfoOrdersById = async (id: number) => {
+   try {
+      const res = await request.getOrderById(id)
+      orderStore.nowOrder = res
+      for (const i of res.order_items) {
+         await getNowOfferById(i.offer_id)
+      }
+
+   } catch (e) {
+      console.log(e)
+   }
 }
 const getOrderById = async (id: number) => {
    orderStore.offersInfo = []
@@ -52,9 +83,10 @@ const getOrderById = async (id: number) => {
    }
 }
 
+
 const changeStatusOrder = async (statusOrder: string) => {
    try {
-      const res = await request.changeStatusOrder(orderStore.offersInfo[0].farm_id, orderStore.nowOrder.id, {status: statusOrder})
+      const res = await request.changeStatusOrder(orderStore.infoOffersNowOrder[0].farm_id, orderStore.nowOrder.id, {status: statusOrder})
       await getOrders()
       infoOrder.value = false
       console.log(res)
@@ -63,14 +95,14 @@ const changeStatusOrder = async (statusOrder: string) => {
    }
 }
 
-const statusesApproveAndDecline = [
-   {title: 'Підтверджено', status: 'APPROVED'},
-   {title: 'Відхилено', status: 'DECLINED'},
-
-]
-
-const statusesShipping = [{title: 'Доставляється', status: 'SHIPPING'}, {title: 'Відхилено', status: 'DECLINED'}]
-const statusesForShipping = [{title: 'Виконано', status: 'COMPLETED'}]
+// const statusesApproveAndDecline = [
+//    {title: 'Підтверджено', status: 'APPROVED'},
+//    {title: 'Відхилено', status: 'DECLINED'},
+//
+// ]
+//
+// const statusesShipping = [{title: 'Доставляється', status: 'SHIPPING'}, {title: 'Відхилено', status: 'DECLINED'}]
+// const statusesForShipping = [{title: 'Виконано', status: 'COMPLETED'}]
 
 const getAddress = async (id: number) => {
    orderStore.allAddress = []
@@ -134,35 +166,39 @@ const statusToString = computed(() => (status: string) => {
 
 
             <div class='order-block' v-if='orderStore.orders.some(order => order.status === "SUBMITTED")'>
-               <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "SUBMITTED")'>Очікують підтвердження</span>
+               <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "SUBMITTED")'>Очікують підтвердження <v-icon size='15'>mdi-reload</v-icon></span>
                <v-card class='order' v-for='i of orderStore.orders' >
 
                   <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "SUBMITTED"'>
 
-                     <div class='w-25 position-relative'>
-                        <v-avatar class='w-100 h-100 ' image='https://cdn-icons-png.flaticon.com/512/1027/1027650.png'>
+<!--                     <div class='w-25 position-relative'>-->
+<!--                        <v-avatar class='w-100 h-100 ' image='https://cdn-icons-png.flaticon.com/512/1027/1027650.png'>-->
 
-                        </v-avatar>
-                        <div class='counter_offers'>{{ i.order_items.length }}</div>
+<!--                        </v-avatar>-->
+<!--                        <div class='counter_offers'>{{ i.order_items.length }}</div>-->
+<!--                     </div>-->
+                     <div class='d-flex w-100'>
+                        <div v-for='j of i.order_items'>
+                           <template v-if="orderStore.offersInfo.find(offer => offer.id === j.offer_id)">
+                              <img width='60px' class='icon-img-order' :src="'https://horodyna.grassbusinesslabs.tk/static/' + orderStore.offersInfo.find(offer => offer.id === j.offer_id).image" alt="Offer Image">
+                           </template>
+                        </div>
                      </div>
 
 
-                     <div class='ml-2'>
-                        <p>
-                           <v-icon>mdi-currency-uah</v-icon>
-                           {{ i.product_price }} грн
-                        </p>
-                        <p>
-                           <v-icon>mdi-truck-delivery-outline</v-icon>
-                           {{ i.shipping_price }} грн
-                        </p>
+                     <div class='ml-2 d-flex justify-space-between w-100'>
+
+
+
+
+
                         <p>
                            <v-icon>
                               mdi-cash
                            </v-icon>
                            {{ i.total_price }} грн</p>
                         <p>
-                           <v-icon>mdi-clock-time-ten-outline</v-icon>
+
                            {{ formatDate(i.created_data) }}
                         </p>
                      </div>
@@ -174,14 +210,21 @@ const statusToString = computed(() => (status: string) => {
 
 
             <div class='order-block' v-if='orderStore.orders.some(order => order.status === "SHIPPING")'>
-               <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "SHIPPING")'>Доставляються</span>
+               <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "SHIPPING")'>Доставляються <v-icon size="15" icon="mdi-truck"></v-icon></span>
                <v-card class='order' v-for='i of orderStore.orders'>
 
                   <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "SHIPPING"'>
-                     <div class='w-25 position-relative'>
-                        <v-avatar class='w-100 h-100'
-                                  image='https://cdn-icons-png.flaticon.com/512/1584/1584365.png'></v-avatar>
-                        <div class='counter_offers'>{{ i.order_items.length }}</div>
+<!--                     <div class='w-25 position-relative'>-->
+<!--                        <v-avatar class='w-100 h-100'-->
+<!--                                  image='https://cdn-icons-png.flaticon.com/512/1584/1584365.png'></v-avatar>-->
+<!--                        <div class='counter_offers'>{{ i.order_items.length }}</div>-->
+<!--                     </div>-->
+                     <div class='d-flex w-100'>
+                        <div v-for='j of i.order_items'>
+                           <template v-if="orderStore.offersInfo.find(offer => offer.id === j.offer_id)">
+                              <img width='60px' class='icon-img-order' :src="'https://horodyna.grassbusinesslabs.tk/static/' + orderStore.offersInfo.find(offer => offer.id === j.offer_id).image" alt="Offer Image">
+                           </template>
+                        </div>
                      </div>
 
                      <div class='ml-2'>
@@ -203,19 +246,26 @@ const statusToString = computed(() => (status: string) => {
             </div>
 
             <div class='order-block' v-if='orderStore.orders.some(order => order.status === "APPROVED")'>
-               <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "APPROVED")'>Підверджені</span>
+               <span class='marker-title' v-if='orderStore.orders.some(order => order.status === "APPROVED")'>Підверджені <v-icon size='15'>mdi-tag-check</v-icon></span>
 
                <v-card class='order' v-for='i of orderStore.orders'>
 
                   <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "APPROVED"'>
 
-                     <div class='w-25 position-relative'>
-                        <v-avatar class='w-100 h-100'
-                                  image='https://cdn-icons-png.flaticon.com/512/1584/1584360.png'></v-avatar>
-                        <div class='counter_offers'>{{ i.order_items.length }}</div>
+<!--                     <div class='w-25 position-relative'>-->
+<!--                        <v-avatar class='w-100 h-100'-->
+<!--                                  image='https://cdn-icons-png.flaticon.com/512/1584/1584360.png'></v-avatar>-->
+<!--                        <div class='counter_offers'>{{ i.order_items.length }}</div>-->
+<!--                     </div>-->
+                     <div class='d-flex w-100'>
+                        <div v-for='j of i.order_items'>
+                           <template v-if="orderStore.offersInfo.find(offer => offer.id === j.offer_id)">
+                              <img width='60px' class='icon-img-order' :src="'https://horodyna.grassbusinesslabs.tk/static/' + orderStore.offersInfo.find(offer => offer.id === j.offer_id).image" alt="Offer Image">
+                           </template>
+                        </div>
                      </div>
 
-                     <div class='ml-2'>
+                     <div class='ml-2 d-flex justify-space-between w-100'>
 
                         <p>
                            <v-icon>
@@ -235,19 +285,26 @@ const statusToString = computed(() => (status: string) => {
             <div class='order-block' v-if='orderStore.orders.some(order => order.status === "DECLINED")'>
 
                <span class='marker-title'
-                     v-if='orderStore.orders.some(order => order.status === "DECLINED")'>Відхилені</span>
+                     v-if='orderStore.orders.some(order => order.status === "DECLINED")'>Відхилені <v-icon size='15'>mdi-close-circle</v-icon></span>
 
                <v-card class='order' v-for='i of orderStore.orders'>
 
                   <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "DECLINED"'>
 
-                     <div class='w-25 position-relative'>
-                        <v-avatar class='w-100 h-100'
-                                  image='https://cdn-icons-png.flaticon.com/512/4109/4109311.png'></v-avatar>
-                        <div class='counter_offers'>{{ i.order_items.length }}</div>
+<!--                     <div class='w-25 position-relative'>-->
+<!--                        <v-avatar class='w-100 h-100'-->
+<!--                                  image='https://cdn-icons-png.flaticon.com/512/4109/4109311.png'></v-avatar>-->
+<!--                        <div class='counter_offers'>{{ i.order_items.length }}</div>-->
+<!--                     </div>-->
+                     <div class='d-flex w-100'>
+                        <div v-for='j of i.order_items'>
+                           <template v-if="orderStore.offersInfo.find(offer => offer.id === j.offer_id)">
+                              <img width='60px' class='icon-img-order' :src="'https://horodyna.grassbusinesslabs.tk/static/' + orderStore.offersInfo.find(offer => offer.id === j.offer_id).image" alt="Offer Image">
+                           </template>
+                        </div>
                      </div>
 
-                     <div class='ml-2'>
+                     <div class='ml-2 d-flex justify-space-between w-100'>
 
                         <p>
                            <v-icon>
@@ -266,19 +323,27 @@ const statusToString = computed(() => (status: string) => {
             <div class='order-block' v-if='orderStore.orders.some(order => order.status === "COMPLETED")'>
 
                <span class='marker-title'
-                     v-if='orderStore.orders.some(order => order.status === "COMPLETED")'>Виконані</span>
+                     v-if='orderStore.orders.some(order => order.status === "COMPLETED")'>Виконані <v-icon size='15'>mdi-check-circle</v-icon></span>
 
                <v-card class='order' v-for='i of orderStore.orders'>
 
                   <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "COMPLETED"'>
 
-                     <div class='w-25 position-relative'>
-                        <v-avatar class='w-100 h-100'
-                                  image='https://w7.pngwing.com/pngs/871/200/png-transparent-check-mark-computer-icons-icon-design-complete-angle-logo-grass-thumbnail.png'></v-avatar>
-                        <div class='counter_offers'>{{ i.order_items.length }}</div>
+<!--                     <div class='w-25 position-relative'>-->
+<!--                        <v-avatar class='w-100 h-100'-->
+<!--                                  image='https://w7.pngwing.com/pngs/871/200/png-transparent-check-mark-computer-icons-icon-design-complete-angle-logo-grass-thumbnail.png'></v-avatar>-->
+<!--                        <div class='counter_offers'>{{ i.order_items.length }}</div>-->
+<!--                     </div>-->
+
+                     <div class='d-flex w-100'>
+                        <div v-for='j of i.order_items'>
+                           <template v-if="orderStore.offersInfo.find(offer => offer.id === j.offer_id)">
+                              <img width='60px' class='icon-img-order' :src="'https://horodyna.grassbusinesslabs.tk/static/' + orderStore.offersInfo.find(offer => offer.id === j.offer_id).image" alt="Offer Image">
+                           </template>
+                        </div>
                      </div>
 
-                     <div class='ml-2'>
+                     <div class='ml-2 d-flex justify-space-between w-100'>
 
 
                         <p>
@@ -315,19 +380,24 @@ const statusToString = computed(() => (status: string) => {
                </v-list-item-subtitle>
             </v-card-title>
             <v-card-text>
-               <div>
-
+               <div class='w-100'>
                   <div class='info-user'>
-                     <div>
+                     <div class='blank-address'>
+                        <div class='d-flex justify-center align-center mb-2'>
+                           <v-avatar class='logo-nova-post' size='25' rounded image='https://play-lh.googleusercontent.com/mtyOm0Rp0PeG_BWE7M5j9gBWuU1Du34LLj-dLdSE1-006_BkFg32W3Cca00l2BBvNM0'></v-avatar>
 
+                        </div>
+                        <p class='username' v-if='orderStore.nowOrder.user'>Отримувач <b>{{ orderStore.nowOrder.user.name }}</b></p>
+                        <p class='username'> Місто доставки <b>{{ orderStore.nowOrder.address }}</b></p>
+                        <p class='username'> Відділення <b>№1</b></p>
+                        <p class='username'> Телефон отримувача <b>+380 96 00 0000</b></p>
+                        <p class='username' v-if='orderStore.nowOrder.ttn !== null'> ТТН <b>2045 2784 9475 2456</b></p>
                      </div>
-                     <p class='username' v-if='orderStore.nowOrder.user'>{{ orderStore.nowOrder.user.name }}</p>
 
-                     <p>{{ orderStore.nowOrder.address }}</p>
                   </div>
 
 
-                  <div v-for='j of orderStore.offersInfo' class='d-flex justify-space-between offer'>
+                  <div v-for='j of orderStore.infoOffersNowOrder' class='d-flex w-100 justify-space-between align-center offer'>
                      <div>
                         <v-avatar size='80' :image='imgURL+j.image'>
 
@@ -335,12 +405,12 @@ const statusToString = computed(() => (status: string) => {
                      </div>
 
 
-                     <div class='w-100 d-flex justify-center'>
-                        <div>
+                     <div class='w-100 d-flex justify-end'>
+                        <div class='w-75'>
                            <h3 class='title-order'>{{ j.title }}</h3>
                            <p>{{ j.description }}</p>
                            <div v-for='i of orderStore.nowOrder.order_items'>
-                              <p v-if='i.offer_id === j.id'>{{ i.amount }}{{ j.unit }} x {{ i.price }}грн</p>
+                              <p class='title-order' v-if='i.offer_id === j.id'>{{ i.amount }}{{ j.unit }} x {{ i.price }}грн</p>
                            </div>
                         </div>
 
@@ -356,49 +426,58 @@ const statusToString = computed(() => (status: string) => {
                <!--            <div class='w-100'>-->
                <!--               <v-btn class='change-status' :block='true'>Змінити статус замовлення</v-btn>-->
                <!--            </div>-->
-               <v-menu v-if='orderStore.nowOrder.status === "SUBMITTED"'>
-                  <template v-slot:activator='{ props }'>
-                     <v-btn
-                        class='w-100 change-status'
-                        v-bind='props'
-                     >
-                        Змінити статус замовлення
-                     </v-btn>
-                  </template>
-                  <v-list>
-                     <v-list-item
+               <div v-if='orderStore.nowOrder.status === "SUBMITTED"' class='w-100 d-flex justify-space-around'>
+                  <v-btn @click='changeStatusOrder("APPROVED")' class='approve-btn'>Підтвердити</v-btn>
+                  <v-btn @click='changeStatusOrder("DECLINED")'  class='decline-btn'>Відхилити</v-btn>
+               </div>
 
-                        @click='changeStatusOrder(item.status)'
-                        v-for='(item, index) in statusesApproveAndDecline'
-                        :key='index'
-                        :value='index'
-                     >
-                        <v-list-item-title>{{ item.title }}</v-list-item-title>
-                     </v-list-item>
-                  </v-list>
-               </v-menu>
+               <div v-if='orderStore.nowOrder.status === "APPROVED"' class='w-100 d-flex justify-space-around'>
+                  <v-btn @click='changeStatusOrder("SHIPPING")' class='approve-btn'>Доставляється</v-btn>
+                  <v-btn @click='changeStatusOrder("DECLINED")'  class='decline-btn'>Відхилити</v-btn>
+               </div>
+<!--               <v-menu v-if='orderStore.nowOrder.status === "SUBMITTED"'>-->
+<!--                  <template v-slot:activator='{ props }'>-->
+<!--                     <v-btn-->
+<!--                        class='w-100 change-status'-->
+<!--                        v-bind='props'-->
+<!--                     >-->
+<!--                        Змінити статус замовлення-->
+<!--                     </v-btn>-->
+<!--                  </template>-->
+<!--                  <v-list>-->
+<!--                     <v-list-item-->
 
-               <v-menu v-if='orderStore.nowOrder.status === "APPROVED"'>
-                  <template v-slot:activator='{ props }'>
-                     <v-btn
-                        class='w-100 change-status'
-                        v-bind='props'
-                     >
-                        Змінити статус замовлення
-                     </v-btn>
-                  </template>
-                  <v-list>
-                     <v-list-item
+<!--                        @click='changeStatusOrder(item.status)'-->
+<!--                        v-for='(item, index) in statusesApproveAndDecline'-->
+<!--                        :key='index'-->
+<!--                        :value='index'-->
+<!--                     >-->
+<!--                        <v-list-item-title>{{ item.title }}</v-list-item-title>-->
+<!--                     </v-list-item>-->
+<!--                  </v-list>-->
+<!--               </v-menu>-->
 
-                        @click='changeStatusOrder(item.status)'
-                        v-for='(item, index) in statusesShipping'
-                        :key='index'
-                        :value='index'
-                     >
-                        <v-list-item-title>{{ item.title }}</v-list-item-title>
-                     </v-list-item>
-                  </v-list>
-               </v-menu>
+<!--               <v-menu v-if='orderStore.nowOrder.status === "APPROVED"'>-->
+<!--                  <template v-slot:activator='{ props }'>-->
+<!--                     <v-btn-->
+<!--                        class='w-100 change-status'-->
+<!--                        v-bind='props'-->
+<!--                     >-->
+<!--                        Змінити статус замовлення-->
+<!--                     </v-btn>-->
+<!--                  </template>-->
+<!--                  <v-list>-->
+<!--                     <v-list-item-->
+
+<!--                        @click='changeStatusOrder(item.status)'-->
+<!--                        v-for='(item, index) in statusesShipping'-->
+<!--                        :key='index'-->
+<!--                        :value='index'-->
+<!--                     >-->
+<!--                        <v-list-item-title>{{ item.title }}</v-list-item-title>-->
+<!--                     </v-list-item>-->
+<!--                  </v-list>-->
+<!--               </v-menu>-->
 
 <!--               <v-menu v-if='orderStore.nowOrder.status === "SHIPPING"'>-->
 <!--                  <template v-slot:activator='{ props }'>-->
@@ -437,6 +516,7 @@ const statusToString = computed(() => (status: string) => {
 .container {
    display: flex;
    margin: 10px;
+   flex-direction: column;
    justify-content: space-around;
    align-items: center;
    padding: 10px;
@@ -450,7 +530,7 @@ const statusToString = computed(() => (status: string) => {
 .offer {
    background: #eeeeee;
    border-radius: 20px;
-   margin: 10px;
+   margin: 10px 0;
    padding: 10px;
 }
 
@@ -460,8 +540,10 @@ const statusToString = computed(() => (status: string) => {
 
 .info-user {
    border-radius: 20px;
-   margin: 10px;
-   padding: 10px;
+   margin-bottom: 10px;
+   padding-bottom: 10px;
+   width: 100%;
+   position: relative;
 }
 
 .username {
@@ -493,6 +575,36 @@ const statusToString = computed(() => (status: string) => {
 
 }
 .order-block{
+   margin: 10px;
+}
+
+.icon-img-order{
+   border-radius: 15px;
+   padding: 5px;
+}
+.approve-btn{
+   background: #6168DB;
+   color: #fff;
+   width: 50%;
+   padding: 5px 20px;
+}
+
+.decline-btn{
+   background: #6168DB;
+   color: #fff;
+   width: 50%;
+   padding: 5px 20px;
+}
+.blank-address{
+   background: #eeeeee;
+   border-radius: 20px;
+
+   padding: 20px;
+}
+.logo-nova-post{
+   position: absolute;
+   right: 0;
+   top: 0;
    margin: 10px;
 }
 </style>

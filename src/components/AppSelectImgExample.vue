@@ -85,7 +85,7 @@
 
    <v-col cols='12 mt-2'>
       <v-btn
-         color='primary'
+         color='#6168DB'
          :block='true'
          @click='chooseFile'
       >
