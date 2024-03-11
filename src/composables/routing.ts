@@ -4,11 +4,11 @@ export const useRouting = () => {
    const router = useRouter()
 
    async function toSignIn() {
-      return router.push('/sign-in')
+      return router.replace('/sign-in')
    }
 
    async function toPosts() {
-      return router.push('/posts')
+      return router.replace('/posts')
    }
 
    return {

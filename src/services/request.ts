@@ -8,14 +8,17 @@ import type {
    changeOffer,
    RegisterBody,
    createFarms,
-   farmResponce, ChangePassword, changeFarm
+   farmResponce, ChangePassword, changeFarm, LoginBodyNumber
 } from '@/models'
+import {setPhoneNumber} from '@/models'
 
 export const requestService = () => {
    const api = apiService()
 
    async function login(body: LoginBody): Promise<CurrentUser> {
-
+      return api.post('/auth/login-email', body)
+   }
+   async function loginWithNumber(body: LoginBodyNumber): Promise<CurrentUser> {
       return api.post('/auth/login', body)
    }
 
@@ -102,9 +105,15 @@ export const requestService = () => {
       return api.put(`/orders/farmer-status/${farmID}/${orderID}`, body)
    }
    async function getPercentage () {
-      return api.get(`orders/farmer-percentage`)
+      return api.get(`/orders/farmer-percentage`)
    }
+   async function setPhoneNumber(body: setPhoneNumber){
+      return api.put('/users/phone-number', body)
+   }
+
    return {
+      setPhoneNumber,
+      loginWithNumber,
       getPercentage,
       changeStatusOrder,
       changeFarm,

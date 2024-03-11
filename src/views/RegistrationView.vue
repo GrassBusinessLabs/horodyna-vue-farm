@@ -27,6 +27,17 @@
 
                <v-col cols='12'>
                   <v-text-field
+                     v-model='phone_number'
+                     v-bind='phone_numberAttrs'
+                     label='Телефон'
+                     :disabled='isSubmitting'
+                     :hide-details='true'
+                     type='text'
+                  ></v-text-field>
+               </v-col>
+
+               <v-col cols='12'>
+                  <v-text-field
                      v-model='password'
                      v-bind='passwordAttrs'
                      label='Пароль'
@@ -79,13 +90,14 @@ import {useHandleError, useRouting} from '@/composables'
 import {authTokenService, formService, requestService} from '@/services'
 import {useUserStore} from '@/stores'
 import RegistrationLayout from '@/layouts/RegistrationLayout.vue'
+import vue from '@vitejs/plugin-vue'
 
 const {handleError} = useHandleError()
 const routing = useRouting()
 const userStore = useUserStore()
 const {setCurrentUser} = userStore
 
-const {vuetifyConfig, usernameValidator, passwordValidator, emailValidator} = formService()
+const {vuetifyConfig, usernameValidator, passwordValidator, emailValidator, phoneNumberValidator} = formService()
 const request = requestService()
 const authToken = authTokenService()
 
@@ -94,13 +106,15 @@ const form = useForm({
       yup.object({
          username: usernameValidator(),
          email: emailValidator(),
-         password: passwordValidator()
+         password: passwordValidator(),
+         phone_number: phoneNumberValidator()
       })
    ),
    initialValues: {
       username: '',
       email: '',
-      password: ''
+      password: '',
+      phone_number: '+38'
    }
 })
 
@@ -108,6 +122,7 @@ const isSubmitting = ref<boolean>(false)
 const [username, usernameAttrs] = form.defineField('username' as MaybeRefOrGetter, vuetifyConfig)
 const [email, emailAttrs] = form.defineField('email' as MaybeRefOrGetter, vuetifyConfig)
 const [password, passwordAttrs] = form.defineField('password' as MaybeRefOrGetter, vuetifyConfig)
+const [phone_number, phone_numberAttrs] = form.defineField('phone_number' as MaybeRefOrGetter, vuetifyConfig)
 
 const showPassword = ref<boolean>(false)
 
@@ -121,6 +136,7 @@ const submit = form.handleSubmit(async values => {
       const body: RegisterBody = {
          name: values.username ? values.username : 'Name not found',
          email: values.email ? values.email : 'Email not found',
+         phone_number: values.phone_number ? values.phone_number : 'Введіть номер телефону',
          password: values.password
       }
 

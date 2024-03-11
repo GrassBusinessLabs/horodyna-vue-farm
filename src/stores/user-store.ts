@@ -77,9 +77,10 @@ import { defineStore } from 'pinia'
 import type { Ref } from 'vue'
 import { ref } from 'vue'
 
-import type {ChangePassword, CurrentUser} from '@/models'
+import type {ChangePassword, CurrentUser, setPhoneNumber} from '@/models'
 import { authTokenService, requestService } from '@/services'
 import { useHandleError, useRouting } from '@/composables'
+import {useFarmStore} from '@/stores/farm-store.ts'
 
 export const useUserStore = defineStore('user', () => {
    const { handleError } = useHandleError()
@@ -147,6 +148,7 @@ export const useUserStore = defineStore('user', () => {
    async function logout(): Promise<void> {
       try {
          await request.logout()
+         useFarmStore().nowFarm = null
       } catch (e) {
          console.error(e)
       } finally {
@@ -157,7 +159,16 @@ export const useUserStore = defineStore('user', () => {
       }
    }
 
+   async function setPhoneNumber(body: setPhoneNumber): Promise<void> {
+      try {
+         await request.setPhoneNumber(body)
+      } catch (e) {
+         console.error(e)
+      }
+   }
+
    return {
+      setPhoneNumber,
       changePassword,
       currentUser,
       setCurrentUser,

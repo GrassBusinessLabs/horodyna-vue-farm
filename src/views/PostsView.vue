@@ -6,7 +6,7 @@
       </v-btn>
 
 
-      <v-card class='order farm-address' :class="{ 'fixed-farm-address': isFixed }" elevation='0'>
+      <v-card class='order farm-address' :class="{ 'fixed-farm-address': isFixed }" elevation='0' v-if='offersStore.offers.length > 0'>
          <v-card-text>
             <div class='d-flex'>
                <v-icon @click='changeFarm = !changeFarm' class='ma-2'>
@@ -239,7 +239,7 @@
                   </v-col>
 
                   <v-col cols='12'>
-                     <v-btn :block='true' class='custom-btn delete-btn' @click='deleteOffer(offersStore.nowOffer.id)'>
+                     <v-btn :block='true' class='custom-btn del-btn' @click='deleteOffer(offersStore.nowOffer.id)'>
                         Видалити
                      </v-btn>
 
@@ -480,7 +480,9 @@ const addFarm = () => {
    sheet.value = false
 
 }
-populateFarms()
+onMounted(async () => {
+   await populateFarms()
+})
 
 async function search(value: string | null): Promise<void> {
    try {
@@ -774,5 +776,9 @@ console.log(userFarms)
    background: #fff;
    outline: #6168DB 1px ridge;
 }
-
+.del-btn{
+   outline: 1px solid #6168DB;
+   color: #6168DB;
+   background: #fff;
+}
 </style>

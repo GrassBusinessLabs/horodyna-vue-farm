@@ -14,8 +14,8 @@
       </v-list>
       <v-bottom-sheet v-model="sheet">
          <v-card
-            height='490'
-            class='pa-0 rounded-t-lg bg-grey-lighten-3'
+            height='500'
+            class='pa-0 bg-grey-lighten-3'
          >
             <v-card-title class='py-7 mb-1 text-center text-white text-h5'>
                {{ category }}
@@ -56,6 +56,17 @@
             </v-card-actions>
          </v-card>
       </v-bottom-sheet>
+
+      <v-bottom-sheet v-model='changePhone'>
+         <v-card>
+            <div class='w-100 d-flex flex-column align-center justify-center'>
+               <v-text-field class='w-75 mt-2' v-model='number.phone_number'></v-text-field>
+
+               <v-btn class='mb-2 w-75 btn-phone' @click='setPhoneNumberFunc()'>Додати</v-btn>
+            </div>
+
+         </v-card>
+      </v-bottom-sheet>
    </settings-layout>
 </template>
 
@@ -65,6 +76,7 @@ import AppSetting from '@/components/AppSetting.vue'
 import {reactive, ref} from 'vue'
 import {useUserStore} from '@/stores'
 import {storeToRefs} from 'pinia'
+import {setPhoneNumber} from '@/models'
 interface SettingItem {
    title: string
    category: string
@@ -90,7 +102,7 @@ const settings = [
 ]
 
 const switchValue = ref(false)
-
+const changePhone = ref(false)
 const sheet = ref(false)
 const changePasswordSheet = ref(false)
 const category = ref('')
@@ -111,6 +123,9 @@ const passwords: ChangePassword = reactive({
    oldPassword: '',
    newPassword: ''
 })
+const number: setPhoneNumber = reactive({
+   phone_number: ''
+})
 
 const changePasswordFun = async () => {
   await userStore.changePassword(passwords)
@@ -122,9 +137,20 @@ const openSheetChangePassword = () => {
    sheet.value = false
 }
 
+const openSheetAddNumber = () => {
+   changePhone.value = !changePhone.value
+}
+
+const setPhoneNumberFunc = async () => {
+  await userStore.setPhoneNumber(number)
+   changePhone.value = false
+   number.phone_number = ''
+}
+
 const settingsItems: SettingItem[] = [
    {title: `Ім'я:`, category: 'Аккаунт', value: currentUser?.value?.name, showSwitch: false, icon: ''},
    {title: 'Email:', category: 'Аккаунт', value: currentUser?.value?.email, showSwitch: false, icon: ''},
+   {title: 'Телефон:', category: 'Аккаунт', value: currentUser?.value?.phone_number, showSwitch: false, icon: 'mdi-pencil', routing: openSheetAddNumber},
    {title: 'Змінити пароль', category: 'Аккаунт', value: '', showSwitch: false, icon: 'mdi-chevron-right', routing: openSheetChangePassword},
    {title: 'Вийти з аккаунту', category: 'Аккаунт', value: '', showSwitch: false, icon: 'mdi-chevron-right', routing: userStore.logout},
    {title: 'Сповіщати', category: 'Повідомлення', value: '', showSwitch: true, icon: ''},
@@ -140,10 +166,14 @@ const settingsItems: SettingItem[] = [
 }
 
 .v-card-title {
-   background-color: #135DD8;
+   background-color: #6168DB;
 }
 .menu-item-setting{
    margin: 5px;
    border-radius: 15px;
+}
+.btn-phone{
+   background: #6168DB;
+   color: #fff;
 }
 </style>

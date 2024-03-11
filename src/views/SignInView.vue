@@ -3,14 +3,16 @@
       <v-sheet class='mx-auto pa-6 rounded-lg' width='350'>
          <v-form @submit.prevent='submit'>
             <v-row>
+
+
                <v-col cols='12'>
                   <v-text-field
-                     v-model='username'
-                     v-bind='usernameAttrs'
-                     label='email'
+                     v-model='phone_number'
+                     v-bind='phone_numberAttrs'
+                     label='телефон'
                      :disabled='isSubmitting'
                      :hide-details='true'
-                     type='email'
+                     type='text'
                   ></v-text-field>
                </v-col>
 
@@ -37,6 +39,8 @@
                      Вхід
                   </v-btn>
                </v-col>
+
+
               <v-col
                   cols='12'
                   class='d-flex justify-center pb-0'
@@ -49,8 +53,12 @@
                   Реєстрація
                 </v-list-item-title>
               </v-col>
+
             </v-row>
          </v-form>
+
+
+
       </v-sheet>
    </auth-layout>
 </template>
@@ -62,7 +70,7 @@ import * as yup from 'yup'
 import type {MaybeRefOrGetter} from 'vue'
 import {ref} from 'vue'
 
-import type {CurrentUser, LoginBody} from '@/models'
+import type {CurrentUser, LoginBody, LoginBodyNumber} from '@/models'
 import {useHandleError, useRouting} from '@/composables'
 import {authTokenService, formService, requestService} from '@/services'
 import {useUserStore} from '@/stores'
@@ -73,26 +81,27 @@ const {handleError} = useHandleError()
 const routing = useRouting()
 const userStore = useUserStore()
 const {setCurrentUser} = userStore
-
-const {vuetifyConfig, usernameValidator, passwordValidator} = formService()
+const {vuetifyConfig, usernameValidator, passwordValidator, phoneNumberValidator} = formService()
 const request = requestService()
 const authToken = authTokenService()
+
 
 const form = useForm({
   validationSchema: toTypedSchema(
       yup.object({
-        email: usernameValidator(),
-        password: passwordValidator()
+         phone_number: phoneNumberValidator(),
+         password: passwordValidator()
       })
   ),
   initialValues: {
-    email: 'sa@test.com',
-    password: '222222'
+    phone_number: '+38',
+    password: ''
   }
 })
 
 const isSubmitting = ref<boolean>(false)
 const [username, usernameAttrs] = form.defineField('email' as MaybeRefOrGetter, vuetifyConfig)
+const [phone_number, phone_numberAttrs] = form.defineField('phone_number' as MaybeRefOrGetter, vuetifyConfig)
 const [password, passwordAttrs] = form.defineField('password' as MaybeRefOrGetter, vuetifyConfig)
 
 const showPassword = ref<boolean>(false)
@@ -108,12 +117,12 @@ const submit = form.handleSubmit(async values => {
     }
     isSubmitting.value = true
 
-    const body: LoginBody = {
-      email: values.email ? values.email : 'Email not found',
+    const body: LoginBodyNumber = {
+       phone_number: values.phone_number ? values.phone_number : 'phone_number not found',
       password: values.password
     }
 
-    const currentUser: CurrentUser = await request.login(body)
+    const currentUser: CurrentUser = await request.loginWithNumber(body)
     setCurrentUser(currentUser)
     await authToken.set(currentUser.token)
 
@@ -126,4 +135,14 @@ const submit = form.handleSubmit(async values => {
     isSubmitting.value = false
   }
 })
+
 </script>
+
+<style scoped>
+.loginWithEmail{
+   width: 100%;
+   background: #fff;
+   outline: 1px solid #6168DB;
+   color: #6168DB;
+}
+</style>

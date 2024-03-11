@@ -7,7 +7,8 @@ interface State {
    allAddress: any [],
    ordersInfo: any [],
    orders_percentage: any[],
-   infoOffersNowOrder: any []
+   infoOffersNowOrder: any [],
+   nowPercent: number
 
 }
 export const useOrderStore = defineStore({id: 'orders',
@@ -18,7 +19,8 @@ export const useOrderStore = defineStore({id: 'orders',
       allAddress: [],
       ordersInfo: [],
       orders_percentage: [],
-      infoOffersNowOrder: []
+      infoOffersNowOrder: [],
+      nowPercent: 0
    })
 
 

@@ -42,6 +42,12 @@ export const formService = () => {
       return required ? validator.required() : validator
    }
 
+   function phoneNumberValidator(required: boolean = true) {
+      const validator = yup.string().min(13).max(14)
+      return required ? validator.required() : validator
+
+   }
+
    function emailValidator(required: boolean = true) {
       const validator = yup.string().min(MIN_EMAIL_LEN).max(MAX_EMAIL_LEN)
       return required ? validator.required() : validator
@@ -53,6 +59,7 @@ export const formService = () => {
       passwordValidator,
       titleValidator,
       textValidator,
-      emailValidator
+      emailValidator,
+      phoneNumberValidator
    }
 }
