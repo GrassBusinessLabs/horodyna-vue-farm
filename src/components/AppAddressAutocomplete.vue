@@ -17,7 +17,7 @@
 
         <div class='d-flex align-center'>
            <v-icon>mdi-map-marker-outline</v-icon>
-           <p class='ml-3'>{{ farm.city }}</p> <br>
+           <p class='ml-3' v-if='farm.city'>{{ farm.city }}</p> <br>
         </div>
 
         <div class='mt-2 d-flex justify-end w-100' @click.stop>
@@ -71,7 +71,7 @@
       <v-card >
          <v-card-text>
             <v-form @submit.prevent="saveData">
-               <v-text-field v-model="farmStore.nowFarm.name" label="Назва ферми" ></v-text-field>
+               <v-text-field v-if='farmStore.nowFarm' v-model="farmStore.nowFarm.name" label="Назва ферми" ></v-text-field>
 
                <v-autocomplete
                   v-model='addressModelUpdateFarm'
@@ -101,7 +101,8 @@
 </template>
 
 <script lang='ts' setup>
-import { ref} from 'vue'
+
+import {Ref, ref} from 'vue'
 import debounce from "lodash.debounce"
 import AppMap from './AppMap.vue'
 import type { AddressItem } from '@/services/map'
@@ -112,6 +113,7 @@ import {useFarmStore} from '@/stores/farm-store.ts'
 import {storeToRefs} from 'pinia'
 import {useUserStore} from '@/stores'
 import router from '@/router'
+import {UserName} from '@/models'
 
 const userStore = useUserStore()
 const {populate} = userStore
@@ -142,7 +144,7 @@ const addFarm = async () => {
    const city = spliteedAdress[2]
    const body:createFarms = {
 
-      name: name.value,
+      name: name.value ? name.value.name : null,
       city: city,
       address: spliteedAdress[0]+","+ spliteedAdress[1]+","+ spliteedAdress[2],
       latitude: 122.21,
@@ -209,7 +211,8 @@ const deleteFarm = async () => {
 
 const sheet = ref(false)
 const map = mapService()
-const name = ref(localStorage.getItem('name') || '')
+const storedName = localStorage.getItem('name');
+const name: Ref<UserName | null> = ref(storedName ? { name: storedName } : null);
 const surname = ref(localStorage.getItem('surname') || '')
 const phoneNumber = ref(localStorage.getItem('phoneNumber') || '')
 const email = ref(localStorage.getItem('email') || '')

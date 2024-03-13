@@ -6,7 +6,7 @@
                <vue-cropper
                   ref='cropper'
                   class='image-container'
-                  :aspect-ratio='1 / 1'
+                  :aspect-ratio='1'
                   :guides='true'
                   :background='false'
                   :view-mode='3'
@@ -131,7 +131,7 @@ async function convertToBase64(file: File): Promise<string> {
       console.log(file.name)
       localStorage.setItem('fileNameAdditional', file.name)
       reader.onload = () => {
-         if (reader.result !== null && typeof reader.result === 'string') {
+         if (null !== reader.result && typeof reader.result === 'string') {
             resolve(reader.result)
             console.log(reader.result)
             const base64Image = reader.result;

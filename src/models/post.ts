@@ -27,7 +27,7 @@ export interface AddPostBody {
 
 }
 export  interface createFarms{
-   name: string
+   name: null | string
    city: string
    address: string
    latitude: number
@@ -42,29 +42,26 @@ export interface changeFarm {
    longitude: number
 }
 
-{
-
+interface FarmItem {
+   id: number;
+   name: string | null;
+   city: string;
+   address: string;
+   latitude: number;
+   longitude: number;
+   all_images: any[];
+   user: {
+      id: number;
+      name: string;
+      email: string;
+   };
 }
+
+
 export  interface farmResponce{
-   items:[{
-      id: number
-      name: string
-      city: string
-      address: string
-      latitude: number
-      longitude: number
-      user:{
-         id: number,
-         name: string,
-         email: string
-
-      }
-   }
-
-
-   ]
-   total: number
-   pages: number
+   items: FarmItem[];
+   total: number;
+   pages: number;
 }
 export interface createOffer{
    title: string,

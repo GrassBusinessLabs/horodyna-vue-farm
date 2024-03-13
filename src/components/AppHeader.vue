@@ -118,9 +118,6 @@ function goToMain() {
    router.replace("/posts")
 }
 
-function aboutUs() {
-   router.replace("/about")
-}
 function addAdress() {
   router.replace("/add-address")
 }

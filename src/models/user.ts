@@ -7,8 +7,12 @@ export interface CurrentUser {
    lastName: string
    token: string
    name: string
+   phone_number: string | undefined
 }
 
+export interface UserName {
+   name: string | null
+}
 export interface ChangePassword {
    oldPassword: string,
    newPassword: string
