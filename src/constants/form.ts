@@ -1,4 +1,4 @@
-export const MIN_USERNAME_LEN: number = 6
+export const MIN_USERNAME_LEN: number = 4
 export const MAX_USERNAME_LEN: number = 50
 
 export const MIN_PASS_LEN: number = 6

@@ -90,6 +90,7 @@ const formatDate = (dateString: any) => {
             <div class='container'>
                <div class='d-flex justify-space-between'>
                   <div class='d-flex flex-column'>
+                     <p class='title-order'>{{ trans.user.name }}</p>
                      <p>{{ formatDate(trans.created_data) }}</p>
 
                   </div>
@@ -97,7 +98,7 @@ const formatDate = (dateString: any) => {
                </div>
 
                <div>
-                     <span class='price-transaction'>
+                     <span class='title-order'>
                      <p>{{ trans.percentage }} <v-icon>mdi-currency-uah</v-icon></p>
                      </span>
                </div>
@@ -122,7 +123,7 @@ const formatDate = (dateString: any) => {
       <v-bottom-sheet v-model='transactionInfoSheet'>
          <v-card>
             <v-card-title class='text-center '>
-               Деталі замовлення #{{ orderStore.nowOrder.id }}
+               Деталі замовлення
             </v-card-title>
             <v-card-subtitle class='text-center '>
                Дата замовлення: {{ formatDate(orderStore.nowOrder.created_data) }}
@@ -133,38 +134,42 @@ const formatDate = (dateString: any) => {
             <v-card-text>
                <div class='info-user'>
                   <div class='blank-address'>
-                     <div class='d-flex justify-center align-center mb-2'>
-                        <v-avatar class='logo-nova-post' size='25' rounded image='https://play-lh.googleusercontent.com/mtyOm0Rp0PeG_BWE7M5j9gBWuU1Du34LLj-dLdSE1-006_BkFg32W3Cca00l2BBvNM0'></v-avatar>
 
-                     </div>
-                     <p class='title-order' v-if='orderStore.nowOrder.user'>Отримувач <b>{{ orderStore.nowOrder.user.name }}</b></p>
-                     <p class='title-order'> Місто доставки <b>{{ orderStore.nowOrder.address }}</b></p>
-                     <p class='title-order'> Відділення <b>№1</b></p>
-                     <p class='title-order'> Телефон отримувача <b>+380 96 00 0000</b></p>
+
+                     <p class='title-order' v-if='orderStore.nowOrder.post_office'>
+                        <v-avatar size='25' rounded
+                                  image='https://play-lh.googleusercontent.com/mtyOm0Rp0PeG_BWE7M5j9gBWuU1Du34LLj-dLdSE1-006_BkFg32W3Cca00l2BBvNM0'></v-avatar>
+                        <b class='ml-2'>{{ orderStore.nowOrder.post_office }}</b></p>
+                     <p class='title-order mt-2' v-if='orderStore.nowOrder.user'><b>{{ orderStore.nowOrder.user.name }}</b></p>
+                     <p class='title-order'><b>+380 96 00 0000</b></p>
                      <p class='title-order' v-if='orderStore.nowOrder.ttn !== null'> ТТН <b>2045 2784 9475 2456</b></p>
                   </div>
-
                </div>
 
-               <div v-for='j of orderStore.infoOffersNowOrder'
+                  <div v-for='j of orderStore.infoOffersNowOrder'
                     class='d-flex w-100 justify-space-between align-center offer'>
 
 
 
                   <div class='d-flex'>
-                     <div>
-                        <v-avatar size='80' :image='imgURL+j.image'>
 
-                        </v-avatar>
-                     </div>
-                     <div class='w-100 ml-4 d-flex justify-end'>
-                        <div class='w-100'>
-                           <h3 class='title-order'>{{ j.title }}</h3>
-                           <p>{{ j.description }}</p>
-                           <div v-for='i of orderStore.nowOrder.order_items'>
-                              <p class='title-order' v-if='i.offer_id === j.id'>{{ i.amount }}{{ j.unit }} x
-                                 {{ i.price }}грн</p>
+                     <div class='w-100 ml-4 d-flex'>
+
+                        <div class='w-100 ml-2 d-flex justify-center align-center'>
+                           <div>
+                              <v-avatar size='80' :image='imgURL+j.image'>
+
+                              </v-avatar>
                            </div>
+                           <div class='ml-2'>
+                              <h3 class='title-order'>{{ j.title }}</h3>
+                              <p>{{ j.description }}</p>
+                              <div  v-for='i of orderStore.nowOrder.order_items'>
+                                 <p class='title-order' v-if='i.offer_id === j.id'>{{ i.amount }}{{ j.unit }} x
+                                    {{ i.price }}<v-icon size='16'>mdi-currency-uah</v-icon></p>
+                              </div>
+                           </div>
+
                         </div>
 
 
@@ -172,8 +177,9 @@ const formatDate = (dateString: any) => {
                   </div>
 
                   <div>
-                     <div v-for='i of orderStore.nowOrder.order_items'>
-                        <p class='title-order' v-if='i.offer_id === j.id'>{{ i.amount * i.price }} грн</p>
+                     <div class='pl-4 d-flex align-center justify-center' v-for='i of orderStore.nowOrder.order_items'>
+                        <p class='title-order' v-if='i.offer_id === j.id'>{{ i.amount * i.price }}</p>
+                        <p class='title-order' ><v-icon size='18' v-if='i.offer_id === j.id'>mdi-currency-uah</v-icon></p>
                      </div>
                   </div>
 

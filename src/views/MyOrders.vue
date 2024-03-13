@@ -180,10 +180,6 @@ const statusToString = computed(() => (status: string) => {
                               </div>
                            </div>
 
-                           <div>
-                              <p>{{i.user.name}}</p>
-                              <p v-if='i.user.phone_number !== null'>{{i.user.phone_number}}</p>
-                           </div>
 
                         </div>
 
@@ -201,6 +197,12 @@ const statusToString = computed(() => (status: string) => {
 
                               {{ formatDate(i.created_data) }}
                            </p>
+                        </div>
+
+
+                        <div class='ml-2 d-flex justify-space-between w-100'>
+                           <p>{{ i.user.name }}</p>
+                           <p v-if='i.user.phone_number !== null'>{{ i.user.phone_number }}</p>
                         </div>
 
                      </div>
@@ -235,10 +237,6 @@ const statusToString = computed(() => (status: string) => {
                            </div>
 
 
-                           <div>
-                              <p>{{i.user.name}}</p>
-                              <p v-if='i.user.phone_number !== null'>{{i.user.phone_number}}</p>
-                           </div>
                         </div>
 
                         <div class='ml-2 d-flex justify-space-between w-100'>
@@ -252,6 +250,12 @@ const statusToString = computed(() => (status: string) => {
                            <p>
                               {{ formatDate(i.created_data) }}
                            </p>
+                        </div>
+
+
+                        <div class='ml-2 d-flex justify-space-between w-100'>
+                           <p>{{ i.user.name }}</p>
+                           <p v-if='i.user.phone_number !== null'>{{ i.user.phone_number }}</p>
                         </div>
 
                      </div>
@@ -287,10 +291,6 @@ const statusToString = computed(() => (status: string) => {
                            </div>
 
 
-                           <div>
-                              <p>{{i.user.name}}</p>
-                              <p v-if='i.user.phone_number !== null'>{{i.user.phone_number}}</p>
-                           </div>
                         </div>
 
                         <div class='ml-2 d-flex justify-space-between w-100'>
@@ -304,6 +304,12 @@ const statusToString = computed(() => (status: string) => {
                            <p>
                               {{ formatDate(i.created_data) }}
                            </p>
+                        </div>
+
+
+                        <div class='ml-2 d-flex justify-space-between w-100'>
+                           <p>{{ i.user.name }}</p>
+                           <p v-if='i.user.phone_number !== null'>{{ i.user.phone_number }}</p>
                         </div>
 
                      </div>
@@ -337,10 +343,6 @@ const statusToString = computed(() => (status: string) => {
                               </div>
                            </div>
 
-                           <div>
-                              <p>{{i.user.name}}</p>
-                              <p v-if='i.user.phone_number !== null'>{{i.user.phone_number}}</p>
-                           </div>
 
                         </div>
 
@@ -355,6 +357,11 @@ const statusToString = computed(() => (status: string) => {
                            <p>
                               {{ formatDate(i.created_data) }}
                            </p>
+                        </div>
+
+                        <div class='ml-2 d-flex justify-space-between w-100'>
+                           <p>{{ i.user.name }}</p>
+                           <p v-if='i.user.phone_number !== null'>{{ i.user.phone_number }}</p>
                         </div>
 
                      </div>
@@ -369,7 +376,7 @@ const statusToString = computed(() => (status: string) => {
                      v-if='orderStore.orders.some(order => order.status === "COMPLETED")'>Виконані <v-icon size='15'>mdi-check-circle</v-icon></span>
 
                <div v-for='i of orderStore.orders'>
-                  <v-card class='order blur-content'  v-if='i.status === "COMPLETED"'>
+                  <v-card class='order blur-content' v-if='i.status === "COMPLETED"'>
 
                      <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "COMPLETED"'>
 
@@ -383,17 +390,13 @@ const statusToString = computed(() => (status: string) => {
                            <div class='d-flex'>
                               <div v-for='j of i.order_items'>
                                  <template v-if='orderStore.offersInfo.find(offer => offer.id === j.offer_id)'>
-                                    <img width='60px' class='icon-img-order'
+                                    <img width='60px' height='60px' class='icon-img-order'
                                          :src="'https://horodyna.grassbusinesslabs.tk/static/' + orderStore.offersInfo.find(offer => offer.id === j.offer_id).image"
                                          alt='Offer Image'>
                                  </template>
                               </div>
                            </div>
 
-                           <div>
-                              <p>{{i.user.name}}</p>
-                              <p v-if='i.user.phone_number !== null'>{{i.user.phone_number}}</p>
-                           </div>
 
                         </div>
 
@@ -409,6 +412,12 @@ const statusToString = computed(() => (status: string) => {
                            <p>
                               {{ formatDate(i.created_data) }}
                            </p>
+                        </div>
+
+
+                        <div class='ml-2 d-flex justify-space-between w-100'>
+                           <p>{{ i.user.name }}</p>
+                           <p v-if='i.user.phone_number !== null'>{{ i.user.phone_number }}</p>
                         </div>
 
                      </div>
@@ -424,11 +433,10 @@ const statusToString = computed(() => (status: string) => {
       <v-bottom-sheet v-model='infoOrder'>
          <v-card height='700' class='bottom-card'>
             <v-card-title class='text-center'>
-               Деталі замовлення #{{ orderStore.nowOrder.id }}
 
-               <v-list-item-subtitle class='my-subtitle pt-2 pb-1'>
+               <v-list-item-title class='my-subtitle pt-2 pb-1'>
                   {{ statusToString(orderStore.nowOrder.status) }}
-               </v-list-item-subtitle>
+               </v-list-item-title>
             </v-card-title>
             <v-card-text>
                <div class='w-100'>
@@ -439,9 +447,12 @@ const statusToString = computed(() => (status: string) => {
                         <p class='username' v-if='orderStore.nowOrder.post_office'>
                            <v-avatar size='25' rounded
                                      image='https://play-lh.googleusercontent.com/mtyOm0Rp0PeG_BWE7M5j9gBWuU1Du34LLj-dLdSE1-006_BkFg32W3Cca00l2BBvNM0'></v-avatar>
+                           <b v-if='orderStore.nowOrder.post_office_city'>{{ orderStore.nowOrder.post_office_city }}</b>
                            <b class='ml-2'>{{ orderStore.nowOrder.post_office }}</b></p>
-                        <p class='username mt-2' v-if='orderStore.nowOrder.user'><b>{{ orderStore.nowOrder.user.name }}</b></p>
-                        <p class='username'><b>+380 96 00 0000</b></p>
+                        <p class='username mt-2' v-if='orderStore.nowOrder.user'><b>{{ orderStore.nowOrder.user.name
+                           }}</b></p>
+                        <p class='username' v-if='orderStore.nowOrder.user'>
+                           <b>{{ orderStore.nowOrder.user.phone_number }}</b></p>
                         <p class='username' v-if='orderStore.nowOrder.ttn !== null'> ТТН <b>2045 2784 9475 2456</b></p>
                      </div>
 
@@ -451,7 +462,7 @@ const statusToString = computed(() => (status: string) => {
                   <div v-for='j of orderStore.infoOffersNowOrder'
                        class='d-flex w-100 justify-space-between align-center offer'>
 
-                     <div class='d-flex'>
+                     <div class='d-flex align-center'>
                         <div>
                            <v-avatar size='80' :image='imgURL+j.image'>
 
@@ -465,7 +476,9 @@ const statusToString = computed(() => (status: string) => {
                               <p>{{ j.description }}</p>
                               <div v-for='i of orderStore.nowOrder.order_items'>
                                  <p class='title-order' v-if='i.offer_id === j.id'>{{ i.amount }}{{ j.unit }} x
-                                    {{ i.price }}грн</p>
+                                    {{ i.price }}
+                                    <v-icon size='16'>mdi-currency-uah</v-icon>
+                                 </p>
                               </div>
                            </div>
 
@@ -474,8 +487,11 @@ const statusToString = computed(() => (status: string) => {
                      </div>
 
                      <div>
-                        <div v-for='i of orderStore.nowOrder.order_items' class='pl-4'>
-                           <p class='title-order' v-if='i.offer_id === j.id'>{{ i.amount * i.price }} грн</p>
+                        <div v-for='i of orderStore.nowOrder.order_items' class='pl-6 d-flex'>
+                           <p class='title-order' v-if='i.offer_id === j.id'>{{ i.amount * i.price }}</p>
+                           <p class='title-order' v-if='i.offer_id === j.id'>
+                              <v-icon size='16'>mdi-currency-uah</v-icon>
+                           </p>
                         </div>
                      </div>
 
@@ -485,7 +501,7 @@ const statusToString = computed(() => (status: string) => {
                </div>
             </v-card-text>
             <v-card-actions class='d-flex justify-center'>
-               <h3 class='text-center'>Сума: {{ orderStore.nowOrder.total_price }} грн</h3>
+               <h3 class='text-center title-order'>Сума: {{ orderStore.nowOrder.total_price }} грн</h3>
             </v-card-actions>
 
             <v-card-actions>
@@ -679,12 +695,14 @@ const statusToString = computed(() => (status: string) => {
    top: 0;
    margin: 10px;
 }
-.blur-content{
+
+.blur-content {
    filter: grayscale(70%);
    opacity: 0.7;
 }
-.blur{
-  filter: grayscale(70%);
+
+.blur {
+   filter: grayscale(70%);
 
 }
 </style>
