@@ -45,19 +45,6 @@ const getNowOfferById = async (id: number) => {
    }
 }
 
-const getNowInfoOrdersById = async (id: number) => {
-   try {
-      const res = await request.getOrderById(id)
-      orderStore.nowOrder = res
-      for (const i of res.order_items) {
-         await getNowOfferById(i.offer_id)
-      }
-
-   } catch (e) {
-      console.log(e)
-   }
-}
-
 onMounted(async () => {
    await getPercentage()
 })
@@ -66,7 +53,6 @@ const infoTransaction = async (orderId: number, percent: number) => {
    orderStore.infoOffersNowOrder = []
    orderStore.nowPercent = percent
    await getOrderById(orderId)
-   await getNowInfoOrdersById(orderId)
    transactionInfoSheet.value = true
 }
 const formatDate = (dateString: any) => {
@@ -122,15 +108,13 @@ const formatDate = (dateString: any) => {
 
       <v-bottom-sheet v-model='transactionInfoSheet'>
          <v-card>
+
             <v-card-title class='text-center '>
-               Деталі замовлення
+               Дата замовлення: {{ formatDate(orderStore.nowOrder.created_data) }}
             </v-card-title>
             <v-card-subtitle class='text-center '>
-               Дата замовлення: {{ formatDate(orderStore.nowOrder.created_data) }}
-            </v-card-subtitle>
-            <v-card-title class='text-center '>
                Відсоток за транзакцію: {{orderStore.nowPercent}} грн
-            </v-card-title>
+            </v-card-subtitle>
             <v-card-text>
                <div class='info-user'>
                   <div class='blank-address'>
@@ -139,37 +123,34 @@ const formatDate = (dateString: any) => {
                      <p class='title-order' v-if='orderStore.nowOrder.post_office'>
                         <v-avatar size='25' rounded
                                   image='https://play-lh.googleusercontent.com/mtyOm0Rp0PeG_BWE7M5j9gBWuU1Du34LLj-dLdSE1-006_BkFg32W3Cca00l2BBvNM0'></v-avatar>
-                        <b class='ml-2'>{{ orderStore.nowOrder.post_office }}</b></p>
+                        <b class='ml-2'>{{orderStore.nowOrder.post_office_city}}, {{ orderStore.nowOrder.post_office }}</b></p>
                      <p class='title-order mt-2' v-if='orderStore.nowOrder.user'><b>{{ orderStore.nowOrder.user.name }}</b></p>
                      <p class='title-order'><b>+380 96 00 0000</b></p>
                      <p class='title-order' v-if='orderStore.nowOrder.ttn !== null'> ТТН <b>2045 2784 9475 2456</b></p>
                   </div>
                </div>
 
-                  <div v-for='j of orderStore.infoOffersNowOrder'
-                    class='d-flex w-100 justify-space-between align-center offer'>
+               <div class='d-flex w-100 justify-space-between align-center offer' v-for='j of orderStore.nowOrder.order_items'>
+                  <div class='d-flex align-center'>
+                     <div>
+                        <div >
+                           <v-avatar size='80' :image='imgURL+j.offer.image'>
+                           </v-avatar>
+                        </div>
+
+                     </div>
 
 
-
-                  <div class='d-flex'>
-
-                     <div class='w-100 ml-4 d-flex'>
-
-                        <div class='w-100 ml-2 d-flex justify-center align-center'>
-                           <div>
-                              <v-avatar size='80' :image='imgURL+j.image'>
-
-                              </v-avatar>
+                     <div class='w-100 ml-4 d-flex justify-start'>
+                        <div class='w-100'>
+                           <h3 class='title-order'>{{ j.offer.title }}</h3>
+                           <p>{{ j.offer.description }}</p>
+                           <div >
+                              <p class='title-order' >{{ j.amount }}{{ j.offer.unit }} x
+                                 {{ j.offer.price }}
+                                 <v-icon size='16'>mdi-currency-uah</v-icon>
+                              </p>
                            </div>
-                           <div class='ml-2'>
-                              <h3 class='title-order'>{{ j.title }}</h3>
-                              <p>{{ j.description }}</p>
-                              <div  v-for='i of orderStore.nowOrder.order_items'>
-                                 <p class='title-order' v-if='i.offer_id === j.id'>{{ i.amount }}{{ j.unit }} x
-                                    {{ i.price }}<v-icon size='16'>mdi-currency-uah</v-icon></p>
-                              </div>
-                           </div>
-
                         </div>
 
 
@@ -177,14 +158,18 @@ const formatDate = (dateString: any) => {
                   </div>
 
                   <div>
-                     <div class='pl-4 d-flex align-center justify-center' v-for='i of orderStore.nowOrder.order_items'>
-                        <p class='title-order' v-if='i.offer_id === j.id'>{{ i.amount * i.price }}</p>
-                        <p class='title-order' ><v-icon size='18' v-if='i.offer_id === j.id'>mdi-currency-uah</v-icon></p>
+                     <div  class='pl-6 d-flex'>
+                        <p class='title-order' >{{ j.amount * j.offer.price }}</p>
+                        <p class='title-order' >
+                           <v-icon size='16'>mdi-currency-uah</v-icon>
+                        </p>
                      </div>
                   </div>
 
 
                </div>
+
+
                <h3 class='text-center mb-3'>Сума: {{ orderStore.nowOrder.total_price }} грн</h3>
 
             </v-card-text>
