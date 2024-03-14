@@ -724,6 +724,7 @@ console.log(userFarms)
    width: 195px;
    height: 195px;
    border-radius: 5%;
+   object-fit: cover;
 }
 
 .order {

@@ -3,7 +3,7 @@
 import HomeLayout from '@/layouts/HomeLayout.vue'
 import {requestService} from '@/services'
 import {useOrderStore} from '@/stores/order-store.ts'
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 
 const imgURL = 'https://horodyna.grassbusinesslabs.tk/static/'
 const infoOrder = ref(false)
@@ -84,37 +84,22 @@ const changeStatusOrder = async (statusOrder: string) => {
    }
 }
 
-// const statusesApproveAndDecline = [
-//    {title: 'Підтверджено', status: 'APPROVED'},
-//    {title: 'Відхилено', status: 'DECLINED'},
-//
-// ]
-//
-// const statusesShipping = [{title: 'Доставляється', status: 'SHIPPING'}, {title: 'Відхилено', status: 'DECLINED'}]
-// const statusesForShipping = [{title: 'Виконано', status: 'COMPLETED'}]
-
-const getAddress = async (id: number) => {
-   orderStore.allAddress = []
-   try {
-      const res = await request.getAddressById(id)
-      orderStore.allAddress.push(res)
-
-   } catch (e) {
-      console.log(e)
-   }
-}
-
+const getMonthName = (monthIndex: number) => {
+   const months = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'];
+   return months[monthIndex];
+};
 
 const formatDate = (dateString: any) => {
-   const options = {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-   }
+   const date = new Date(dateString);
+   const day = date.getDate();
+   const monthIndex = date.getMonth();
+   const year = date.getFullYear();
 
-   const formattedDate = new Date(dateString).toLocaleString('ua-UA', options)
-   return formattedDate
-}
+   const monthName = getMonthName(monthIndex);
+
+   return `${day} ${monthName} ${year}`;
+};
+
 
 const statusToString = computed(() => (status: string) => {
    if (status === 'APPROVED') {
@@ -133,6 +118,7 @@ const statusToString = computed(() => (status: string) => {
       return 'Очікує підвердження'
    }
 })
+
 
 
 </script>
@@ -160,42 +146,32 @@ const statusToString = computed(() => (status: string) => {
 
                      <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "SUBMITTED"'>
 
-                        <div class='d-flex w-100 justify-space-between'>
-                           <div class='d-flex'>
-                              <div v-for='j of i.order_items'>
-
-                                 <div v-for='l of j'>
-                                    <img class='icon-img-order' v-if='l.image' :src='imgURL + l.image' height='60px' width='60px'>
-                                 </div>
-
+                        <div class='d-flex justify-space-between w-100 mb-2' >
+                           <div class='d-flex overflow-x-auto w-50'>
+                              <div class='d-flex' :style="{ position: 'relative', left: (index * -7) + '%', zIndex: index, opacity: 1 }" v-for='(j, index) of i.order_items'>
+                                 <img class='icon-img-order' :src='imgURL + j.offer.image' height='60px' width='60px'>
                               </div>
                            </div>
 
+                           <div class='d-flex flex-column justify-center align-end w-50'>
+                              <p class='username user'>{{ i.user.name }}</p>
+                              <p class='username phone_number'>{{ i.user.phone_number}}</p>
+
+                           </div>
 
                         </div>
+                        <div class='ml-2 mt-2 d-flex justify-space-between w-100 '>
 
-
-                        <div class='ml-2 d-flex justify-space-between w-100'>
-
-
-                           <p>
+                           <p class='total-sum-order'>
                               <v-icon>
                                  mdi-cash
                               </v-icon>
                               {{ i.total_price }} грн
                            </p>
-                           <p>
-
+                           <p class='date-order'>
                               {{ formatDate(i.created_data) }}
                            </p>
                         </div>
-
-
-                        <div class='ml-2 d-flex justify-space-between w-100'>
-                           <p>{{ i.user.name }}</p>
-                           <p v-if='i.user.phone_number !== null'>{{ i.user.phone_number }}</p>
-                        </div>
-
                      </div>
 
                   </v-card>
@@ -211,42 +187,32 @@ const statusToString = computed(() => (status: string) => {
                   <v-card class='order' v-if='i.status === "SHIPPING"'>
 
                      <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "SHIPPING"'>
-                        <!--                     <div class='w-25 position-relative'>-->
-                        <!--                        <v-avatar class='w-100 h-100'-->
-                        <!--                                  image='https://cdn-icons-png.flaticon.com/512/1584/1584365.png'></v-avatar>-->
-                        <!--                        <div class='counter_offers'>{{ i.order_items.length }}</div>-->
-                        <!--                     </div>-->
-                        <div class='d-flex w-100 justify-space-between'>
-                           <div class='d-flex'>
-                              <div v-for='j of i.order_items'>
 
-                                 <div v-for='l of j'>
-                                    <img class='icon-img-order' v-if='l.image' :src='imgURL + l.image' height='60px' width='60px'>
-                                 </div>
-
+                        <div class='d-flex justify-space-between w-100 mb-2' >
+                           <div class='d-flex overflow-x-auto w-50'>
+                              <div class='d-flex' :style="{ position: 'relative', left: (index * -7) + '%', zIndex: index, opacity: 1 }" v-for='(j, index) of i.order_items'>
+                                 <img class='icon-img-order' :src='imgURL + j.offer.image' height='60px' width='60px'>
                               </div>
                            </div>
 
+                           <div class='d-flex flex-column justify-center align-end w-50'>
+                              <p class='username user'>{{ i.user.name }}</p>
+                              <p class='username phone_number'>{{ i.user.phone_number}}</p>
+
+                           </div>
 
                         </div>
+                        <div class='ml-2 mt-2 d-flex justify-space-between w-100 '>
 
-                        <div class='ml-2 d-flex justify-space-between w-100'>
-
-                           <p>
+                           <p class='total-sum-order'>
                               <v-icon>
                                  mdi-cash
                               </v-icon>
                               {{ i.total_price }} грн
                            </p>
-                           <p>
+                           <p class='date-order'>
                               {{ formatDate(i.created_data) }}
                            </p>
-                        </div>
-
-
-                        <div class='ml-2 d-flex justify-space-between w-100'>
-                           <p>{{ i.user.name }}</p>
-                           <p v-if='i.user.phone_number !== null'>{{ i.user.phone_number }}</p>
                         </div>
 
                      </div>
@@ -264,43 +230,31 @@ const statusToString = computed(() => (status: string) => {
                   <v-card class='order' v-if='i.status === "APPROVED"'>
 
                      <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "APPROVED"'>
-
-                        <!--                     <div class='w-25 position-relative'>-->
-                        <!--                        <v-avatar class='w-100 h-100'-->
-                        <!--                                  image='https://cdn-icons-png.flaticon.com/512/1584/1584360.png'></v-avatar>-->
-                        <!--                        <div class='counter_offers'>{{ i.order_items.length }}</div>-->
-                        <!--                     </div>-->
-                        <div class='d-flex w-100 justify-space-between'>
-                           <div class='d-flex'>
-                              <div v-for='j of i.order_items'>
-
-                                 <div v-for='l of j'>
-                                    <img class='icon-img-order' v-if='l.image' :src='imgURL + l.image' height='60px' width='60px'>
-                                 </div>
-
+                        <div class='d-flex justify-space-between w-100 mb-2' >
+                           <div class='d-flex overflow-x-auto w-50'>
+                              <div class='d-flex' :style="{ position: 'relative', left: (index * -7) + '%', zIndex: index, opacity: 1 }" v-for='(j, index) of i.order_items'>
+                                 <img class='icon-img-order' :src='imgURL + j.offer.image' height='60px' width='60px'>
                               </div>
                            </div>
 
+                           <div class='d-flex flex-column justify-center align-end w-50'>
+                              <p class='username user'>{{ i.user.name }}</p>
+                              <p class='username phone_number'>{{ i.user.phone_number}}</p>
+
+                           </div>
 
                         </div>
+                        <div class='ml-2 mt-2 d-flex justify-space-between w-100 '>
 
-                        <div class='ml-2 d-flex justify-space-between w-100'>
-
-                           <p>
+                           <p class='total-sum-order'>
                               <v-icon>
                                  mdi-cash
                               </v-icon>
                               {{ i.total_price }} грн
                            </p>
-                           <p>
+                           <p class='date-order'>
                               {{ formatDate(i.created_data) }}
                            </p>
-                        </div>
-
-
-                        <div class='ml-2 d-flex justify-space-between w-100'>
-                           <p>{{ i.user.name }}</p>
-                           <p v-if='i.user.phone_number !== null'>{{ i.user.phone_number }}</p>
                         </div>
 
                      </div>
@@ -318,50 +272,39 @@ const statusToString = computed(() => (status: string) => {
 
                      <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "DECLINED"'>
 
-                        <!--                     <div class='w-25 position-relative'>-->
-                        <!--                        <v-avatar class='w-100 h-100'-->
-                        <!--                                  image='https://cdn-icons-png.flaticon.com/512/4109/4109311.png'></v-avatar>-->
-                        <!--                        <div class='counter_offers'>{{ i.order_items.length }}</div>-->
-                        <!--                     </div>-->
-                        <div class='d-flex w-100 justify-space-between'>
-                           <div class='d-flex'>
-                              <div v-for='j of i.order_items'>
-
-                                 <div v-for='l of j'>
-                                    <img class='icon-img-order' v-if='l.image' :src='imgURL + l.image' height='60px' width='60px'>
-                                 </div>
-
+                        <div class='d-flex justify-space-between w-100 mb-2' >
+                           <div class='d-flex overflow-x-auto w-50'>
+                              <div class='d-flex' :style="{ position: 'relative', left: (index * -7) + '%', zIndex: index, opacity: 1 }" v-for='(j, index) of i.order_items'>
+                                 <img class='icon-img-order' :src='imgURL + j.offer.image' height='60px' width='60px'>
                               </div>
                            </div>
 
+                           <div class='d-flex flex-column justify-center align-end w-50'>
+                              <p class='username user'>{{ i.user.name }}</p>
+                              <p class='username phone_number'>{{ i.user.phone_number}}</p>
+
+                           </div>
 
                         </div>
+                        <div class='ml-2 mt-2 d-flex justify-space-between w-100 '>
 
-                        <div class='ml-2 d-flex justify-space-between w-100'>
-
-                           <p>
+                           <p class='total-sum-order'>
                               <v-icon>
                                  mdi-cash
                               </v-icon>
                               {{ i.total_price }} грн
                            </p>
-                           <p>
+                           <p class='date-order'>
                               {{ formatDate(i.created_data) }}
                            </p>
                         </div>
-
-                        <div class='ml-2 d-flex justify-space-between w-100'>
-                           <p>{{ i.user.name }}</p>
-                           <p v-if='i.user.phone_number !== null'>{{ i.user.phone_number }}</p>
-                        </div>
-
                      </div>
                   </v-card>
                </div>
 
             </div>
 
-            <div class='order-block' v-if='orderStore.orders.some(order => order.status === "COMPLETED")'>
+            <div class='order-block ' v-if='orderStore.orders.some(order => order.status === "COMPLETED")' >
 
                <span class='marker-title'
                      v-if='orderStore.orders.some(order => order.status === "COMPLETED")'>Виконані <v-icon size='15'>mdi-check-circle</v-icon></span>
@@ -370,45 +313,31 @@ const statusToString = computed(() => (status: string) => {
                   <v-card class='order blur-content' v-if='i.status === "COMPLETED"'>
 
                      <div class='container' @click='infoByOrder(i.id)' v-if='i.status === "COMPLETED"'>
-
-                        <!--                     <div class='w-25 position-relative'>-->
-                        <!--                        <v-avatar class='w-100 h-100'-->
-                        <!--                                  image='https://w7.pngwing.com/pngs/871/200/png-transparent-check-mark-computer-icons-icon-design-complete-angle-logo-grass-thumbnail.png'></v-avatar>-->
-                        <!--                        <div class='counter_offers'>{{ i.order_items.length }}</div>-->
-                        <!--                     </div>-->
-
-                        <div class='d-flex w-100 justify-space-between'>
-                           <div class='d-flex'>
-                              <div v-for='j of i.order_items'>
-
-                                 <div v-for='l of j'>
-                                    <img class='icon-img-order' v-if='l.image' :src='imgURL + l.image' height='60px' width='60px'>
-                                 </div>
-
+                        <div class='d-flex justify-space-between w-100 mb-2' >
+                           <div class='d-flex overflow-x-auto w-50'>
+                              <div class='d-flex' :style="{ position: 'relative', left: (index * -7) + '%', zIndex: index, opacity: 1 }" v-for='(j, index) of i.order_items'>
+                                 <img class='icon-img-order' :src='imgURL + j.offer.image' height='60px' width='60px'>
                               </div>
                            </div>
 
+                           <div class='d-flex flex-column justify-center align-end w-50'>
+                              <p class='username user'>{{ i.user.name }}</p>
+                              <p class='username phone_number'>{{ i.user.phone_number}}</p>
+
+                           </div>
 
                         </div>
+                        <div class='ml-2 mt-2 d-flex justify-space-between w-100 '>
 
-                        <div class='ml-2 d-flex justify-space-between w-100'>
-
-
-                           <p>
+                           <p class='total-sum-order'>
                               <v-icon>
                                  mdi-cash
                               </v-icon>
                               {{ i.total_price }} грн
                            </p>
-                           <p>
+                           <p class='date-order'>
                               {{ formatDate(i.created_data) }}
                            </p>
-                        </div>
-
-
-                        <div class='ml-2 d-flex justify-space-between w-100'>
-                           <p>{{ i.user.name }}</p>
-                           <p v-if='i.user.phone_number !== null'>{{ i.user.phone_number }}</p>
                         </div>
 
                      </div>
@@ -589,7 +518,7 @@ const statusToString = computed(() => (status: string) => {
 
 .container {
    display: flex;
-   margin: 10px;
+   margin: 10px 10px 0 10px;
    flex-direction: column;
    justify-content: space-around;
    align-items: center;
@@ -655,8 +584,12 @@ const statusToString = computed(() => (status: string) => {
 
 .icon-img-order {
    border-radius: 15px;
-   padding: 5px;
+   //padding: 5px;
+   object-fit: cover;
+   box-shadow: 0px 0px 15px 0px rgba(176,176,176, 1);
+   background: #fff;
 }
+
 
 .approve-btn {
    background: #6168DB;
@@ -687,6 +620,7 @@ const statusToString = computed(() => (status: string) => {
    margin: 10px;
 }
 
+
 .blur-content {
    filter: grayscale(70%);
    opacity: 0.7;
@@ -695,5 +629,24 @@ const statusToString = computed(() => (status: string) => {
 .blur {
    filter: grayscale(70%);
 
+}
+.date-order{
+   color: grey;
+   font-weight: 500;
+   font-size: 14px;
+
+}
+.total-sum-order{
+   color: grey;
+   font-weight: 700;
+
+}
+
+.user{
+   font-weight: 800;
+
+}
+.phone_number{
+   font-weight: 500;
 }
 </style>
