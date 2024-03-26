@@ -1,7 +1,7 @@
 {
-  "name": "vue3-boilerplate",
+  "name": "horodyna-farm",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.7.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,7 +11,7 @@
   "dependencies": {
     "@capacitor/android": "5.7.0",
     "@capacitor/core": "^5.7.0",
-    "@capacitor/ios": "5.7.0",
+    "@capacitor/ios": "5.7.2",
     "@ionic/vue": "^7.7.2",
     "@ionic/vue-router": "^7.7.2",
     "@tomtom-international/web-sdk-maps": "^6.25.0",
@@ -38,6 +38,7 @@
     "@types/node": "^20.10.3",
     "@types/vue-cropperjs": "^4.1.6",
     "@vitejs/plugin-vue": "^4.5.0",
+    "@vue/cli-service": "5.0.8",
     "sass": "^1.69.5",
     "typescript": "^5.2.2",
     "vite": "^5.0.0",
